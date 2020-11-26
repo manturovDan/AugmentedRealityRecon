@@ -1,6 +1,7 @@
 package arrec;
 
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -9,13 +10,18 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.highgui.*;
+import org.opencv.imgcodecs.Imgcodecs;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 
 public class UserInterface extends Application implements Runnable {
     private static int height;
     private static int width;
-    private ImageView imgView;
+    private static ImageView imgView;
 
     public void setHeight(int _height) {
         height = _height;
@@ -36,7 +42,6 @@ public class UserInterface extends Application implements Runnable {
         stage.setScene(scene);
         stage.setTitle("Augmented Reality Recon");
 
-
         stage.show();
     }
 
@@ -49,10 +54,18 @@ public class UserInterface extends Application implements Runnable {
     }
 
     public synchronized void updateSnap(Mat image) {
-
+        if (imgView != null) {
+            imgView.setImage(MatToImg(image));
+        }
     }
 
     public static void main(String[] args) {
         Application.launch();
+    }
+
+    private Image MatToImg(Mat image) {
+        MatOfByte byteMat = new MatOfByte();
+        Imgcodecs.imencode(".bmp", image, byteMat);
+        return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
 }

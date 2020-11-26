@@ -35,5 +35,8 @@ public class MainController {
         Thread guiThread = new Thread(gui);
         guiThread.start();
 
+        while (true) {
+            gui.updateSnap(vision.getImageToOut());
+        }
     }
 }
