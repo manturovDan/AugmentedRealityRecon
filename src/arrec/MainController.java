@@ -1,8 +1,14 @@
 package arrec;
 
+import org.opencv.core.Core;
+
 import java.io.File;
 
 public class MainController {
+    static {
+        System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
+    }
+
     private File calibrationFile;
     private int camIdx = 0;
 
