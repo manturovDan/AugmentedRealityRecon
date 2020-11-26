@@ -3,6 +3,7 @@ package arrec;
 import org.opencv.core.Core;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 public class MainController {
     static {
@@ -17,12 +18,22 @@ public class MainController {
         camIdx = camId;
     }
 
-    public void run() {
+    public void run() throws Exception {
         Vision vision = new Vision(camIdx, calibrationFile);
+        vision.initForRecognition();
+        Thread visThread = new Thread(vision);
+        visThread.start();
 
         UserInterface gui = new UserInterface();
-        gui.setHeight(500);
-        gui.setWidth(700);
-        gui.run();
+
+        while (vision.getVideoWidth() <= 0 || vision.getVideoHeight() <= 0) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
+
+        gui.setHeight(vision.getVideoHeight());
+        gui.setWidth(vision.getVideoWidth());
+        Thread guiThread = new Thread(gui);
+        guiThread.start();
+
     }
 }
