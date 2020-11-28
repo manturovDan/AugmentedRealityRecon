@@ -53,6 +53,7 @@ public class VisionResult {
         }
 
         public Builder corners(ArrayList<Mat> _corners) {
+            corners = new ArrayList<>();
             for (Mat c : _corners) {
                 corners.add(new Mat());
                 c.copyTo(corners.get(corners.size() - 1));
