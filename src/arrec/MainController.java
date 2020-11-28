@@ -46,6 +46,8 @@ public class MainController {
             }
 
             gui.updateSnap(renderer.MatToImg(snapshot.getImage()));
+
+            renderer.printMarkersInfo(snapshot);
         }
     }
 }
