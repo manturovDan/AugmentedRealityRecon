@@ -1,11 +1,13 @@
 package arrec;
 
 import javafx.scene.image.Image;
+import org.opencv.aruco.Aruco;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 
 public class Renderer {
 
@@ -35,5 +37,20 @@ public class Renderer {
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".bmp", image, byteMat);
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
+    }
+
+    public void drawAxis(Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
+        Mat curTvec = new Mat();
+        tvec.copyTo(curTvec);
+
+        double[] curTvecVal = curTvec.get(0, 0);
+        curTvecVal[0] += 0.1;
+
+        curTvec.put(0, 0, curTvecVal);
+
+
+        //System.out.println(tvec.dump());
+
+        Aruco.drawAxis(image, camMatrix, dstMatrix, rvec, curTvec, 0.1f);
     }
 }

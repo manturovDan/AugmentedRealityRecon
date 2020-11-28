@@ -93,4 +93,12 @@ public class Vision implements Runnable {
     synchronized VisionResult getResult() {
         return curResult;
     }
+
+    public Mat getCamMatrix() {
+        return camMatrix;
+    }
+
+    public Mat getDstMatrix() {
+        return dstMatrix;
+    }
 }
