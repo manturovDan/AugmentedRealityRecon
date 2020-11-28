@@ -35,8 +35,17 @@ public class MainController {
         Thread guiThread = new Thread(gui);
         guiThread.start();
 
+        Renderer renderer = new Renderer();
+
+        VisionResult snapshot;
         while (true) {
-            gui.updateSnap(vision.getImageToOut());
+            snapshot = vision.getResult();
+            if (snapshot == null) { //is not loaded yet
+                TimeUnit.MILLISECONDS.sleep(100);
+                continue;
+            }
+
+            gui.updateSnap(renderer.MatToImg(snapshot.getImage()));
         }
     }
 }

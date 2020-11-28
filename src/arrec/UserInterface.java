@@ -53,9 +53,9 @@ public class UserInterface extends Application implements Runnable {
         Application.launch();
     }
 
-    public synchronized void updateSnap(Mat image) {
+    public synchronized void updateSnap(Image image) {
         if (imgView != null) {
-            imgView.setImage(MatToImg(image));
+            imgView.setImage(image);
         }
     }
 
@@ -63,9 +63,5 @@ public class UserInterface extends Application implements Runnable {
         Application.launch();
     }
 
-    private Image MatToImg(Mat image) {
-        MatOfByte byteMat = new MatOfByte();
-        Imgcodecs.imencode(".bmp", image, byteMat);
-        return new Image(new ByteArrayInputStream(byteMat.toArray()));
-    }
+
 }

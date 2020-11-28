@@ -7,6 +7,7 @@ import org.opencv.videoio.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class Vision implements Runnable {
     private final int camId;
@@ -16,9 +17,15 @@ public class Vision implements Runnable {
     private VideoCapture inputVideo;
     private Dictionary dict;
     private boolean isHandling;
-
     private Mat image;
-    private Mat imageToOut;
+
+    private ArrayList<Mat> corners;
+    private Mat ids;
+
+    private Mat rvecs;
+    private Mat tvecs;
+
+    private VisionResult curResult;
 
     public void setCamCalibrationFromFile() throws FileNotFoundException {
         CamParamsReader readKfs = new CamParamsReader(calibrationFile);
@@ -43,14 +50,26 @@ public class Vision implements Runnable {
         inputVideo.open(camId);
         dict = Aruco.getPredefinedDictionary(Aruco.DICT_6X6_250);
         image = new Mat();
-        imageToOut = new Mat();
     }
 
     void handleVideo() {
         isHandling = true;
+
         while (isHandling && inputVideo.grab()) {
             inputVideo.retrieve(image);
-            setImageToOut();
+
+            corners = new ArrayList<>();
+            ids = new Mat();
+            Aruco.detectMarkers(image, dict, corners, ids);
+
+            if (ids.size(0) > 0) {
+                rvecs = new Mat();
+                tvecs = new Mat();
+
+                Aruco.estimatePoseSingleMarkers(corners, 0.13f, camMatrix, dstMatrix, rvecs, tvecs);
+            }
+
+            setCalculationResults();
         }
     }
 
@@ -59,12 +78,8 @@ public class Vision implements Runnable {
         handleVideo();
     }
 
-    synchronized void setImageToOut() {
-        image.copyTo(imageToOut);
-    }
-
-    synchronized Mat getImageToOut() {
-        return imageToOut;
+    synchronized void setCalculationResults() {
+        curResult = new VisionResult.Builder().image(image).corners(corners).ids(ids).rvecs(rvecs).tvecs(tvecs).build();
     }
 
     public int getVideoWidth() {
@@ -73,5 +88,9 @@ public class Vision implements Runnable {
 
     public int getVideoHeight() {
         return image.height();
+    }
+
+    synchronized VisionResult getResult() {
+        return curResult;
     }
 }
