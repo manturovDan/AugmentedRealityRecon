@@ -1,6 +1,8 @@
 package arrec;
 
 import java.io.*;
+import java.util.ArrayList;
+
 import org.json.*;
 import org.opencv.core.Scalar;
 
@@ -30,7 +32,8 @@ public class Model3DImporter {
         return resModelStr.toString();
     }
 
-    public Model3D build() {
+    public ArrayList<Polygon> build() {
+        ArrayList<Polygon> Model3D = new ArrayList<>();
         String jsonData = readModelFile();
         JSONObject jObj = new JSONObject(jsonData);
 
@@ -49,8 +52,13 @@ public class Model3DImporter {
             }
 
             polyCV.build();
+
+            if (!polyCV.isBuilt())
+                throw new RuntimeException("You have an error in 3d model syntax. Check Polygon " + i );
+
+            Model3D.add(polyCV);
         }
 
-        return null;
+        return Model3D;
     }
 }

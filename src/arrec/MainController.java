@@ -3,6 +3,7 @@ package arrec;
 import org.opencv.core.Core;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainController {
@@ -38,7 +39,9 @@ public class MainController {
         Renderer renderer = new Renderer();
 
         Model3DImporter mImporter = new Model3DImporter("resources/grogu.json");
-        Model3D showModel = mImporter.build();
+        ArrayList<Polygon> showModel = mImporter.build();
+
+        System.out.print(showModel);
 
         VisionResult snapshot;
 
