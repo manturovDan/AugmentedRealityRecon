@@ -43,6 +43,32 @@ public class Renderer {
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
 
+    public void drawModel(ArrayList<Polygon> model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
+        for (Polygon poly : model) {
+            MatOfPoint2f points2f = new MatOfPoint2f();
+
+            MatOfPoint3f pointsToProject = poly.getPoints();
+
+            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
+
+            ArrayList<MatOfPoint> pointsList = new ArrayList<>();
+            pointsList.add(
+                    new MatOfPoint (
+                            points2f.toArray()[0],
+                            points2f.toArray()[1],
+                            points2f.toArray()[2],
+                            points2f.toArray()[3]
+                    )
+            );
+
+            Imgproc.fillPoly (
+                    image,
+                    pointsList,
+                    poly.getColor()
+            );
+        }
+    }
+
     @DebugAnno
     public void drawAxis(Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         Mat curTvec = new Mat();
@@ -60,10 +86,10 @@ public class Renderer {
         );
 
         MatOfPoint3f pointsToProject = new MatOfPoint3f(
-                new Point3(new double[] { 0., -0.05, .1, 1 }),
-                new Point3(new double[] { 0., 0.05, .1, 1 }),
-                new Point3(new double[] { 0., 0.05, .0, 1 }),
-                new Point3(new double[] { 0., -0.05, .0, 1 }));
+                new Point3(new double[] { 0.039999999, 0.039999999, 0, 1 }),
+                new Point3(new double[] { -0.039999999, 0.039999999, 0, 1 }),
+                new Point3(new double[] { -0.039999999, -0.039999999, .0, 1 }),
+                new Point3(new double[] { 0.039999999, -0.039999999, 0., 1 }));
 
         MatOfPoint2f points2f = new MatOfPoint2f();
         Mat jacobian = new Mat();

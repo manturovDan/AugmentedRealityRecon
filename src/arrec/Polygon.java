@@ -24,8 +24,7 @@ public class Polygon {
     }
 
     public void addPoint(double[] pnt) {
-        double[] newPoint = Arrays.copyOf(pnt, 3);
-        prevPoints.add(new Point3(newPoint));
+        prevPoints.add(new Point3(new double[] {pnt[0], pnt[1], pnt[2], 1.}));
     }
 
     public void build() {
@@ -33,10 +32,19 @@ public class Polygon {
             return;
 
         points = new MatOfPoint3f(prevPoints.toArray(new Point3[0]));
+        System.out.print("Color " +color );
     }
 
     public boolean isBuilt() {
         return points != null && prevPoints.size() >= 3;
+    }
+
+    public MatOfPoint3f getPoints() {
+        return points;
+    }
+
+    public Scalar getColor() {
+        return color;
     }
 
     @Override

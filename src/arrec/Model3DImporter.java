@@ -48,7 +48,7 @@ public class Model3DImporter {
 
             for (int p = 0; p < points.length(); ++p) {
                 JSONArray onePoint = points.getJSONArray(p);
-                polyCV.addPoint(new double[] { onePoint.getDouble(0), onePoint.getDouble(1), onePoint.getDouble(2)} );
+                polyCV.addPoint(new double[] { onePoint.getDouble(0), onePoint.getDouble(1), 2 * onePoint.getDouble(2), 1.} );
             }
 
             polyCV.build();
