@@ -36,6 +36,18 @@ public class Polygon {
     }
 
     public boolean isBuilt() {
-        return points != null;
+        return points != null && prevPoints.size() >= 3;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder retStr = new StringBuilder("{\n");
+
+        if (isBuilt()) {
+            retStr.append("points: ").append(points.dump()).append("\n");
+        }
+        retStr.append("color: ").append(color).append("\n}");
+
+        return retStr.toString();
     }
 }

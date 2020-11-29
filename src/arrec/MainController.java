@@ -37,7 +37,11 @@ public class MainController {
 
         Renderer renderer = new Renderer();
 
+        Model3DImporter mImporter = new Model3DImporter("resources/grogu.json");
+        Model3D showModel = mImporter.build();
+
         VisionResult snapshot;
+
         while (true) {
             snapshot = vision.getResult();
             if (snapshot == null) { //is not loaded yet
