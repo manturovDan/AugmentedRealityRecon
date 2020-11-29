@@ -43,6 +43,7 @@ public class Renderer {
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
 
+    @DebugAnno
     public void drawAxis(Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         Mat curTvec = new Mat();
         tvec.copyTo(curTvec);
