@@ -1,10 +1,13 @@
 package arrec;
 
+import javafx.scene.Group;
 import javafx.scene.image.Image;
+import javafx.scene.shape.Sphere;
 import org.opencv.aruco.Aruco;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.calib3d.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -44,10 +47,33 @@ public class Renderer {
         tvec.copyTo(curTvec);
 
         double[] curTvecVal = curTvec.get(0, 0);
-        curTvecVal[0] += 0.1;
+        //curTvecVal[0] += 0.1;
 
+        Imgproc.circle (
+                image,                 //Matrix obj of the image
+                new Point(230, 160),    //Center of the circle
+                0,                    //Radius
+                new Scalar(0, 0, 255),  //Scalar object for color
+                10                      //Thickness of the circle
+        );
+
+        MatOfPoint3f pointsToProject = new MatOfPoint3f(new Point3(new double[] { 0., 0., .15, 1}));
+
+        MatOfPoint2f points2f = new MatOfPoint2f();
+        Mat jacobian = new Mat();
+
+        Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, jacobian);
+
+        Imgproc.circle (
+                image,                 //Matrix obj of the image
+                points2f.toArray()[0],    //Center of the circle
+                0,                    //Radius
+                new Scalar(0, 255, 255),  //Scalar object for color
+                10                      //Thickness of the circle
+        );
+
+        System.out.println(points2f.dump());
         curTvec.put(0, 0, curTvecVal);
-
 
         //System.out.println(tvec.dump());
 

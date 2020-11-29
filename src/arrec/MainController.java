@@ -45,8 +45,9 @@ public class MainController {
                 continue;
             }
 
-            if (snapshot.getRvecs() != null && snapshot.getTvecs() != null)
+            if (snapshot.getRvecs() != null && snapshot.getTvecs() != null) {
                 renderer.drawAxis(snapshot.getImage(), vision.getCamMatrix(), vision.getDstMatrix(), snapshot.getRvecs().row(0), snapshot.getTvecs().row(0));
+            }
 
             gui.updateSnap(renderer.MatToImg(snapshot.getImage()));
 

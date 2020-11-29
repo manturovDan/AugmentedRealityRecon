@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -22,6 +23,7 @@ public class UserInterface extends Application implements Runnable {
     private static int height;
     private static int width;
     private static ImageView imgView;
+    private static Group root;
 
     public void setHeight(int _height) {
         height = _height;
@@ -36,7 +38,7 @@ public class UserInterface extends Application implements Runnable {
         File splashScreen = new File("resources/gf_yoda.png");
 
         imgView = new ImageView(new Image(splashScreen.toURI().toString()));
-        Group root = new Group(imgView);
+        root = new Group(imgView);
         Scene scene = new Scene(root, width, height);
 
         stage.setScene(scene);
