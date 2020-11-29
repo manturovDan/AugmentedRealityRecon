@@ -10,6 +10,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.calib3d.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Renderer {
@@ -49,15 +50,19 @@ public class Renderer {
         double[] curTvecVal = curTvec.get(0, 0);
         //curTvecVal[0] += 0.1;
 
-        Imgproc.circle (
-                image,                 //Matrix obj of the image
-                new Point(230, 160),    //Center of the circle
-                0,                    //Radius
-                new Scalar(0, 0, 255),  //Scalar object for color
-                10                      //Thickness of the circle
+        Imgproc.rectangle (
+            image,
+            new Point(230, 160),
+            new Point(250, 180),
+            new Scalar(0, 0, 255),
+            -1
         );
 
-        MatOfPoint3f pointsToProject = new MatOfPoint3f(new Point3(new double[] { 0., 0., .15, 1}));
+        MatOfPoint3f pointsToProject = new MatOfPoint3f(
+                new Point3(new double[] { 0., -0.05, .1, 1 }),
+                new Point3(new double[] { 0., 0.05, .1, 1 }),
+                new Point3(new double[] { 0., 0.05, .0, 1 }),
+                new Point3(new double[] { 0., -0.05, .0, 1 }));
 
         MatOfPoint2f points2f = new MatOfPoint2f();
         Mat jacobian = new Mat();
@@ -72,7 +77,24 @@ public class Renderer {
                 10                      //Thickness of the circle
         );
 
-        System.out.println(points2f.dump());
+        ArrayList<MatOfPoint> list = new ArrayList();
+        list.add(
+                new MatOfPoint (
+                        points2f.toArray()[0],
+                        points2f.toArray()[1],
+                        points2f.toArray()[2],
+                        points2f.toArray()[3]
+                )
+        );
+
+
+        Imgproc.fillPoly (
+                image,
+                list,
+                new Scalar(0, 255, 255)
+        );
+
+        //System.out.println(points2f.dump());
         curTvec.put(0, 0, curTvecVal);
 
         //System.out.println(tvec.dump());
