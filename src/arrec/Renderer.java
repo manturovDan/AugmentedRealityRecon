@@ -44,16 +44,20 @@ public class Renderer {
     }
 
     public void drawModel(ArrayList<Polygon> model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
+        Mat R = new Mat();
+        Calib3d.Rodrigues(rvec, R);
+        Mat zVec = new Mat();
+        R.row(2).copyTo(zVec);
+        System.out.println("zvec0: " + zVec.dump());
+        Polygon.make1Size(zVec);
+        System.out.println("zvec1: " + zVec.dump());
+
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
 
-            Mat R = new Mat();
-            Calib3d.Rodrigues(rvec, R);
-            Mat zVec = R.row(2);
-
             double dot = poly.getNormal().dot(zVec);
 
-            if (dot >= 0)
+            if (dot > 0)
                 continue;
 
             MatOfPoint3f pointsToProject = poly.getPoints();
@@ -77,10 +81,9 @@ public class Renderer {
                     poly.getColor()
             );
 
-            System.out.println(dot <= 0);
             System.out.println(poly);
         }
-        System.out.println("//");
+        System.out.println("zvec2: " + zVec.dump() + "\n//");
     }
 
     @DebugAnno

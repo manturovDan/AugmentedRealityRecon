@@ -48,8 +48,23 @@ public class Polygon {
                 prevPoints.get(2).y - prevPoints.get(0).y,
                 prevPoints.get(2).z - prevPoints.get(0).z);
 
+        String v1 = vec1.dump();
+        String v2 = vec2.dump();
 
-        return vec1.cross(vec2);
+        Mat cross =  vec1.cross(vec2);
+
+        String norm1 = cross.dump();
+        make1Size(cross);
+
+        String norm = cross.dump();
+        return cross;
+    }
+
+    public static void make1Size(Mat vector) {
+        double vecLength = Math.sqrt(Math.pow(vector.get(0, 0)[0], 2) + Math.pow(vector.get(0, 1)[0], 2) + Math.pow(vector.get(0, 2)[0], 2));
+        vector.put(0, 0, vector.get(0, 0)[0] / vecLength);
+        vector.put(0, 1, vector.get(0, 1)[0] / vecLength);
+        vector.put(0, 2, vector.get(0, 2)[0] / vecLength);
     }
 
     public Scalar getColor() {
@@ -64,7 +79,8 @@ public class Polygon {
             retStr.append("points: ").append(points.dump()).append("\n");
         }
         retStr.append("color: ").append(color).append("\n}");
-        retStr.append("normal: ").append(getNormal().dump() + "\n");
+        retStr.append("normal: ").append(getNormal().dump() + "\n" +
+                "(" + Math.sqrt(Math.pow(getNormal().get(0, 0)[0], 2) + Math.pow(getNormal().get(0, 1)[0], 2) + Math.pow(getNormal().get(0, 2)[0], 2)) + ")\n");
         return retStr.toString();
     }
 }
