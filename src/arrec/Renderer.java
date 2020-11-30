@@ -67,25 +67,6 @@ public class Renderer {
                             points2f.toArray()[3]
                     )
             );
-            System.out.println(20);
-            int fourth = getFourth(pointsList.get(0), 2, 0);
-
-            System.out.println(31);
-            if ((fourth % 2) == (getFourth(pointsList.get(0), 3, 1) % 2))
-                continue;
-
-            if (poly.isOdd() && (fourth % 2 == 0)) {
-                continue;
-            }
-            else if (!poly.isOdd() && (fourth %2 == 1)) {
-                continue;
-            }
-
-            Imgproc.fillPoly (
-                    image,
-                    pointsList,
-                    poly.getColor()
-            );
 
             Imgproc.circle (
                     image,                 //Matrix obj of the image
@@ -102,6 +83,45 @@ public class Renderer {
                     new Scalar(0, 0, 255),  //Scalar object for color
                     10                      //Thickness of the circle
             );
+
+            Imgproc.circle (
+                    image,                 //Matrix obj of the image
+                    points2f.toArray()[1],    //Center of the circle
+                    0,                    //Radius
+                    new Scalar(0, 0, 0),  //Scalar object for color
+                    10                      //Thickness of the circle
+            );
+
+            Imgproc.circle (
+                    image,                 //Matrix obj of the image
+                    points2f.toArray()[3],    //Center of the circle
+                    0,                    //Radius
+                    new Scalar(0, 0, 0),  //Scalar object for color
+                    10                      //Thickness of the circle
+            );
+
+
+            System.out.println(20);
+            int fourth = getFourth(pointsList.get(0), 2, 0);
+
+            System.out.println(31);
+
+            if (poly.isOdd() && (fourth % 2 == 0)) {
+                //continue;
+                break;
+            }
+            else if (!poly.isOdd() && (fourth %2 == 1)) {
+                //continue;
+                break;
+            }
+
+            Imgproc.fillPoly (
+                    image,
+                    pointsList,
+                    poly.getColor()
+            );
+
+            break;
 
             //System.out.println(poly);
         }
