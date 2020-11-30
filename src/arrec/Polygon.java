@@ -1,9 +1,7 @@
 package arrec;
 
 import javafx.geometry.Point3D;
-import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Point3;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,11 +10,6 @@ public class Polygon {
     private MatOfPoint3f points;
     private ArrayList<Point3> prevPoints;
     private Scalar color;
-
-    public Polygon(MatOfPoint3f pointsArr, Scalar _color) {
-        points = pointsArr;
-        color = _color;
-    }
 
     public Polygon(Scalar _color) {
         color = _color;
@@ -43,6 +36,22 @@ public class Polygon {
         return points;
     }
 
+    public Mat getNormal() {
+        Mat vec1 = new Mat(1, 3, CvType.CV_64FC1);
+        Mat vec2 = new Mat(1, 3, CvType.CV_64FC1);
+
+        vec1.put(0, 0, prevPoints.get(1).x - prevPoints.get(0).x,
+                prevPoints.get(1).y - prevPoints.get(0).y,
+                prevPoints.get(1).z - prevPoints.get(0).z);
+
+        vec2.put(0, 0, prevPoints.get(2).x - prevPoints.get(0).x,
+                prevPoints.get(2).y - prevPoints.get(0).y,
+                prevPoints.get(2).z - prevPoints.get(0).z);
+
+
+        return vec1.cross(vec2);
+    }
+
     public Scalar getColor() {
         return color;
     }
@@ -55,7 +64,7 @@ public class Polygon {
             retStr.append("points: ").append(points.dump()).append("\n");
         }
         retStr.append("color: ").append(color).append("\n}");
-
+        retStr.append("normal: ").append(getNormal().dump() + "\n");
         return retStr.toString();
     }
 }

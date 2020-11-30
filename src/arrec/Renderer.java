@@ -47,9 +47,19 @@ public class Renderer {
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
 
+            Mat R = new Mat();
+            Calib3d.Rodrigues(rvec, R);
+            Mat zVec = R.row(2);
+
+            double dot = poly.getNormal().dot(zVec);
+
+            if (dot >= 0)
+                continue;
+
             MatOfPoint3f pointsToProject = poly.getPoints();
 
-            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
+            Mat jacobian = new Mat();
+            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, jacobian);
 
             ArrayList<MatOfPoint> pointsList = new ArrayList<>();
             pointsList.add(
@@ -66,7 +76,11 @@ public class Renderer {
                     pointsList,
                     poly.getColor()
             );
+
+            System.out.println(dot <= 0);
+            System.out.println(poly);
         }
+        System.out.println("//");
     }
 
     @DebugAnno
