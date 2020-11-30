@@ -50,6 +50,8 @@ public class Renderer {
         R.row(2).copyTo(zVec);
         Polygon.make1Size(zVec);
 
+        System.out.println(R.dump());
+
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
 
@@ -101,10 +103,10 @@ public class Renderer {
             );
 
 
-            System.out.println(20);
+            //System.out.println(20);
             int fourth = getFourth(pointsList.get(0), 2, 0);
 
-            System.out.println(31);
+            //System.out.println(31);
 
             if (poly.isOdd() && (fourth % 2 == 0)) {
                 //continue;
@@ -131,7 +133,7 @@ public class Renderer {
     private int getFourth(MatOfPoint points, int left, int right) {
         double x = points.toArray()[left].x - points.toArray()[right].x;
         double y = points.toArray()[left].y - points.toArray()[right].y;
-        System.out.println("{ " + x + ", " + y + " }");
+        //System.out.println("{ " + x + ", " + y + " }");
 
         if (x > 0) {
             if (y > 0) {
