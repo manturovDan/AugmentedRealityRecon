@@ -48,9 +48,9 @@ public class Renderer {
         Calib3d.Rodrigues(rvec, R);
         Mat zVec = new Mat();
         R.row(2).copyTo(zVec);
-        System.out.println("zvec0: " + zVec.dump());
+        //System.out.println("zvec0: " + zVec.dump());
         Polygon.make1Size(zVec);
-        System.out.println("zvec1: " + zVec.dump());
+        //System.out.println("zvec1: " + zVec.dump());
 
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
@@ -81,9 +81,9 @@ public class Renderer {
                     poly.getColor()
             );
 
-            System.out.println(poly);
+            //System.out.println(poly);
         }
-        System.out.println("zvec2: " + zVec.dump() + "\n//");
+        //System.out.println("zvec2: " + zVec.dump() + "\n//");
     }
 
     @DebugAnno
@@ -94,7 +94,7 @@ public class Renderer {
         double[] curTvecVal = curTvec.get(0, 0);
         //curTvecVal[0] += 0.1;
 
-        Imgproc.rectangle (
+        /*Imgproc.rectangle (
             image,
             new Point(230, 160),
             new Point(250, 180),
@@ -141,7 +141,7 @@ public class Renderer {
         //System.out.println(points2f.dump());
         curTvec.put(0, 0, curTvecVal);
 
-        //System.out.println(tvec.dump());
+        //System.out.println(tvec.dump());*/
 
         Aruco.drawAxis(image, camMatrix, dstMatrix, rvec, curTvec, 0.1f);
     }

@@ -8,6 +8,7 @@ import org.opencv.videoio.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Vision implements Runnable {
     private final int camId;
@@ -52,7 +53,7 @@ public class Vision implements Runnable {
         image = new Mat();
     }
 
-    void handleVideo() {
+    void handleVideo() throws Exception {
         isHandling = true;
 
         while (isHandling && inputVideo.grab()) {
@@ -70,12 +71,16 @@ public class Vision implements Runnable {
             }
 
             setCalculationResults();
+
+            TimeUnit.MILLISECONDS.sleep(27);
         }
     }
 
     @Override
     public void run() {
-        handleVideo();
+        try {
+            handleVideo();
+        } catch (Exception ignored) {}
     }
 
     synchronized void setCalculationResults() {
