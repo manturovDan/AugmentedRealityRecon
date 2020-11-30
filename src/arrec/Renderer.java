@@ -48,17 +48,10 @@ public class Renderer {
         Calib3d.Rodrigues(rvec, R);
         Mat zVec = new Mat();
         R.row(2).copyTo(zVec);
-        //System.out.println("zvec0: " + zVec.dump());
         Polygon.make1Size(zVec);
-        //System.out.println("zvec1: " + zVec.dump());
 
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
-
-            double dot = poly.getNormal().dot(zVec);
-
-            if (dot > 0)
-                continue;
 
             MatOfPoint3f pointsToProject = poly.getPoints();
 
@@ -74,6 +67,19 @@ public class Renderer {
                             points2f.toArray()[3]
                     )
             );
+            System.out.println(20);
+            int fourth = getFourth(pointsList.get(0), 2, 0);
+
+            System.out.println(31);
+            if ((fourth % 2) == (getFourth(pointsList.get(0), 3, 1) % 2))
+                continue;
+
+            if (poly.isOdd() && (fourth % 2 == 0)) {
+                continue;
+            }
+            else if (!poly.isOdd() && (fourth %2 == 1)) {
+                continue;
+            }
 
             Imgproc.fillPoly (
                     image,
@@ -81,9 +87,45 @@ public class Renderer {
                     poly.getColor()
             );
 
+            Imgproc.circle (
+                    image,                 //Matrix obj of the image
+                    points2f.toArray()[2],    //Center of the circle
+                    0,                    //Radius
+                    new Scalar(0, 255, 255),  //Scalar object for color
+                    10                      //Thickness of the circle
+            );
+
+            Imgproc.circle (
+                    image,                 //Matrix obj of the image
+                    points2f.toArray()[0],    //Center of the circle
+                    0,                    //Radius
+                    new Scalar(0, 0, 255),  //Scalar object for color
+                    10                      //Thickness of the circle
+            );
+
             //System.out.println(poly);
         }
         //System.out.println("zvec2: " + zVec.dump() + "\n//");
+    }
+
+    private int getFourth(MatOfPoint points, int left, int right) {
+        double x = points.toArray()[left].x - points.toArray()[right].x;
+        double y = points.toArray()[left].y - points.toArray()[right].y;
+        System.out.println("{ " + x + ", " + y + " }");
+
+        if (x > 0) {
+            if (y > 0) {
+                return 1;
+            } else {
+                return 4;
+            }
+        } else {
+            if (y > 0) {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
     }
 
     @DebugAnno

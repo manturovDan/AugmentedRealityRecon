@@ -40,6 +40,7 @@ public class Model3DImporter {
         JSONArray polygons = jObj.getJSONArray("polygons");
         for (int i = 0; i < polygons.length(); ++i) {
             JSONObject poly = polygons.getJSONObject(i);
+
             JSONArray points = poly.getJSONArray("points");
             JSONArray color = poly.getJSONArray("color");
 
@@ -51,6 +52,7 @@ public class Model3DImporter {
                 polyCV.addPoint(new double[] { onePoint.getDouble(0), onePoint.getDouble(1), onePoint.getDouble(2), 1.} );
             }
 
+            polyCV.setOdd(poly.getBoolean("odd"));
             polyCV.build();
 
             if (!polyCV.isBuilt())

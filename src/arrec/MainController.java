@@ -38,7 +38,7 @@ public class MainController {
 
         Renderer renderer = new Renderer();
 
-        Model3DImporter mImporter = new Model3DImporter("resources/grogu.json");
+        Model3DImporter mImporter = new Model3DImporter("resources/grogu_v.json");
         ArrayList<Polygon> showingModel = mImporter.build();
 
         //System.out.print(showingModel);
@@ -60,6 +60,7 @@ public class MainController {
             gui.updateSnap(renderer.MatToImg(snapshot.getImage()));
 
             //renderer.printMarkersInfo(snapshot);
+            TimeUnit.MILLISECONDS.sleep(30);
         }
     }
 }

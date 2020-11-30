@@ -10,6 +10,7 @@ public class Polygon {
     private MatOfPoint3f points;
     private ArrayList<Point3> prevPoints;
     private Scalar color;
+    private boolean odd;
 
     public Polygon(Scalar _color) {
         color = _color;
@@ -20,12 +21,20 @@ public class Polygon {
         prevPoints.add(new Point3(new double[] {pnt[0], pnt[1], pnt[2], 1.}));
     }
 
+    public void setOdd(boolean isOdd) {
+        odd = isOdd;
+    }
+
+    public boolean isOdd() {
+        return odd;
+    }
+
     public void build() {
         if (prevPoints.size() < 3)
             return;
 
         points = new MatOfPoint3f(prevPoints.toArray(new Point3[0]));
-        System.out.print("Color " +color );
+        System.out.print(this);
     }
 
     public boolean isBuilt() {
@@ -78,9 +87,8 @@ public class Polygon {
         if (isBuilt()) {
             retStr.append("points: ").append(points.dump()).append("\n");
         }
-        retStr.append("color: ").append(color).append("\n}");
-        retStr.append("normal: ").append(getNormal().dump() + "\n" +
-                "(" + Math.sqrt(Math.pow(getNormal().get(0, 0)[0], 2) + Math.pow(getNormal().get(0, 1)[0], 2) + Math.pow(getNormal().get(0, 2)[0], 2)) + ")\n");
+        retStr.append("color: ").append(color).append("\n");
+        retStr.append("normal: ").append(getNormal().dump()).append("\n").append("odd: ").append(odd).append("\n}");
         return retStr.toString();
     }
 }

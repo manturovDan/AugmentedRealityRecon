@@ -72,7 +72,7 @@ public class Vision implements Runnable {
 
             setCalculationResults();
 
-            TimeUnit.MILLISECONDS.sleep(27);
+            TimeUnit.MILLISECONDS.sleep(50);
         }
     }
 
