@@ -50,7 +50,7 @@ public class Renderer {
         R.row(2).copyTo(zVec);
         Polygon.make1Size(zVec);
 
-        System.out.println(R.dump());
+        //System.out.println(R.dump());
 
         for (Polygon poly : model) {
             MatOfPoint2f points2f = new MatOfPoint2f();
@@ -73,40 +73,6 @@ public class Renderer {
                             points2f.toArray()[3]
                     )
             );
-
-
-            Imgproc.circle (
-                    image,                 //Matrix obj of the image
-                    points2f.toArray()[2],    //Center of the circle
-                    0,                    //Radius
-                    new Scalar(0, 255, 255),  //Scalar object for color
-                    10                      //Thickness of the circle
-            );
-
-            Imgproc.circle (
-                    image,                 //Matrix obj of the image
-                    points2f.toArray()[0],    //Center of the circle
-                    0,                    //Radius
-                    new Scalar(0, 0, 255),  //Scalar object for color
-                    10                      //Thickness of the circle
-            );
-
-            Imgproc.circle (
-                    image,                 //Matrix obj of the image
-                    points2f.toArray()[1],    //Center of the circle
-                    0,                    //Radius
-                    new Scalar(0, 0, 0),  //Scalar object for color
-                    10                      //Thickness of the circle
-            );
-
-            Imgproc.circle (
-                    image,                 //Matrix obj of the image
-                    points2f.toArray()[3],    //Center of the circle
-                    0,                    //Radius
-                    new Scalar(0, 0, 0),  //Scalar object for color
-                    10                      //Thickness of the circle
-            );
-
 
             Imgproc.fillPoly (
                     image,
