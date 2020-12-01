@@ -60,6 +60,10 @@ public class Renderer {
             Mat jacobian = new Mat();
             Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, jacobian);
 
+
+            if (!isVisible(points2f))
+                continue;
+
             ArrayList<MatOfPoint> pointsList = new ArrayList<>();
             pointsList.add(
                     new MatOfPoint (
@@ -69,6 +73,7 @@ public class Renderer {
                             points2f.toArray()[3]
                     )
             );
+
 
             Imgproc.circle (
                     image,                 //Matrix obj of the image
@@ -103,20 +108,6 @@ public class Renderer {
             );
 
 
-            //System.out.println(20);
-            int fourth = getFourth(pointsList.get(0), 2, 0);
-
-            //System.out.println(31);
-
-            if (poly.isOdd() && (fourth % 2 == 0)) {
-                //continue;
-                break;
-            }
-            else if (!poly.isOdd() && (fourth %2 == 1)) {
-                //continue;
-                break;
-            }
-
             Imgproc.fillPoly (
                     image,
                     pointsList,
@@ -128,6 +119,22 @@ public class Renderer {
             //System.out.println(poly);
         }
         //System.out.println("zvec2: " + zVec.dump() + "\n//");
+    }
+
+    public boolean isVisible(MatOfPoint2f points2f) {
+        Mat vec20 = new Mat(1, 3, CvType.CV_64FC1);
+        Mat vec31 = new Mat(1, 3, CvType.CV_64FC1);
+
+        vec20.put(0, 0, points2f.toArray()[2].x - points2f.toArray()[0].x,
+                points2f.toArray()[2].y - points2f.toArray()[0].y, 0);
+
+        vec31.put(0, 0, points2f.toArray()[3].x - points2f.toArray()[1].x,
+                points2f.toArray()[3].y - points2f.toArray()[1].y, 0);
+
+        Mat cross = vec20.cross(vec31);
+
+
+        return cross.get(0, 2)[0] > 0;
     }
 
     private int getFourth(MatOfPoint points, int left, int right) {
