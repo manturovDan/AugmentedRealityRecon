@@ -43,7 +43,7 @@ public class Renderer {
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
 
-    public void drawModel(ArrayList<Polygon> model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
+    public void drawModel(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         Mat R = new Mat();
         Calib3d.Rodrigues(rvec, R);
         Mat zVec = new Mat();
@@ -52,7 +52,7 @@ public class Renderer {
 
         //System.out.println(R.dump());
 
-        for (Polygon poly : model) {
+        for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
 
             MatOfPoint3f pointsToProject = poly.getPoints();

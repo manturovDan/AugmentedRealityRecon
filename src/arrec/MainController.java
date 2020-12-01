@@ -39,7 +39,7 @@ public class MainController {
         Renderer renderer = new Renderer();
 
         Model3DImporter mImporter = new Model3DImporter("resources/grogu_v.json");
-        ArrayList<Polygon> showingModel = mImporter.build();
+        Model3D showingModel = mImporter.build();
 
         //System.out.print(showingModel);
 

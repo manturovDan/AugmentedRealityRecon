@@ -10,27 +10,32 @@ public class Polygon {
     private MatOfPoint3f points;
     private ArrayList<Point3> prevPoints;
     private Scalar color;
+    private int face;
 
-    public Polygon(Scalar _color) {
+    public Polygon(Scalar _color, int _face) {
         color = _color;
         prevPoints = new ArrayList<>();
+        face = _face;
+
     }
 
     public void addPoint(double[] pnt) {
         prevPoints.add(new Point3(new double[] {pnt[0], pnt[1], pnt[2], 1.}));
     }
 
+    public int getFace() {
+        return face;
+    }
 
     public void build() {
-        if (prevPoints.size() < 3)
+        if (prevPoints.size() != 4)
             return;
 
         points = new MatOfPoint3f(prevPoints.toArray(new Point3[0]));
-        System.out.print(this);
     }
 
     public boolean isBuilt() {
-        return points != null && prevPoints.size() >= 3;
+        return points != null && prevPoints.size() == 4;
     }
 
     public MatOfPoint3f getPoints() {
@@ -80,7 +85,7 @@ public class Polygon {
             retStr.append("points: ").append(points.dump()).append("\n");
         }
         retStr.append("color: ").append(color).append("\n");
-        retStr.append("normal: ").append(getNormal().dump()).append("\n}");
+        retStr.append("normal: ").append(getNormal().dump()).append("\nface: ").append(face).append("\n}\n");
         return retStr.toString();
     }
 }
