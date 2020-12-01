@@ -61,7 +61,7 @@ public class Renderer {
                 continue;
 
             renderQueue.add(new Pair<>(poly, points2f));
-
+/*
             ArrayList<MatOfPoint> pointsList = new ArrayList<>();
             pointsList.add(
                     new MatOfPoint (
@@ -76,13 +76,39 @@ public class Renderer {
                     image,
                     pointsList,
                     poly.getColor()
-            );
+            );*/
         }
 
-        correctRenderOrder(renderQueue);
+        renderQueue = correctRenderOrder(renderQueue);
+
+        drawQueue(image, renderQueue);
     }
 
-    public boolean isVisible(MatOfPoint2f points2f) {
+    private void drawQueue(Mat image, ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
+        //System.out.println("painting");
+        for (Pair<Polygon, MatOfPoint2f> polyWithProj : renderQueue) {
+            MatOfPoint2f points2f = polyWithProj.getValue();
+            ArrayList<MatOfPoint> pointsList = new ArrayList<>();
+            pointsList.add(
+                new MatOfPoint (
+                        points2f.toArray()[0],
+                        points2f.toArray()[1],
+                        points2f.toArray()[2],
+                        points2f.toArray()[3]
+                )
+            );
+
+            Imgproc.fillPoly (
+                image,
+                pointsList,
+                polyWithProj.getKey().getColor()
+            );
+
+            //System.out.println("painted: " + polyWithProj.getKey().getFace());
+        }
+    }
+
+    private boolean isVisible(MatOfPoint2f points2f) {
         Mat vec20 = new Mat(1, 3, CvType.CV_64FC1);
         Mat vec31 = new Mat(1, 3, CvType.CV_64FC1);
 
@@ -98,10 +124,10 @@ public class Renderer {
         return cross.get(0, 2)[0] > 0;
     }
 
-    public void correctRenderOrder(ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
-        System.out.println("before: ");
-        renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
-        System.out.println();
+    private ArrayList<Pair<Polygon, MatOfPoint2f>> correctRenderOrder(ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
+        //System.out.println("before: ");
+        //renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
+        //System.out.println();
 
         for (Pair<ArrayList<Integer>, ArrayList<Integer>> correction : model3d.getRenderCorrections()) {
             ArrayList<Integer> idxesOfBacks = new ArrayList<>();
@@ -121,7 +147,7 @@ public class Renderer {
             }
 
             if (countOfAppeared == correction.getKey().size()) {
-                ArrayList<Pair<Polygon, MatOfPoint2f>> newRenderQueue = new ArrayList<>();
+                ArrayList<Pair<Polygon, MatOfPoint2f>> newRenderQueue = new ArrayList<>(renderQueue.size());
 
                 for (Integer i : idxesOfBacks) {
                     newRenderQueue.add(renderQueue.get(i));
@@ -137,8 +163,10 @@ public class Renderer {
             }
         }
 
-        renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
-        System.out.println();
+        //renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
+        //System.out.println();
+
+        return renderQueue;
     }
 
     private int getFourth(MatOfPoint points, int left, int right) {

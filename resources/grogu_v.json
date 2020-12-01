@@ -182,8 +182,8 @@
 
   "render_correction": [
     {
-      "if_visible" : [0, 1],
-      "render_last" : [81, 91, 101, 131, 142, 151, 161, 171]
+      "if_visible" : [0],
+      "render_last" : [81, 91, 101, 111, 131]
     }
   ]
 }
