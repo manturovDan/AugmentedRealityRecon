@@ -3,6 +3,7 @@ package arrec;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Sphere;
+import javafx.util.Pair;
 import org.opencv.aruco.Aruco;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -10,10 +11,13 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.calib3d.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 
 public class Renderer {
+    private Model3D model3d;
 
     public void printMarkersInfo(VisionResult result) {
         if (result == null) {
@@ -44,25 +48,19 @@ public class Renderer {
     }
 
     public void drawModel(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
-        Mat R = new Mat();
-        Calib3d.Rodrigues(rvec, R);
-        Mat zVec = new Mat();
-        R.row(2).copyTo(zVec);
-        Polygon.make1Size(zVec);
-
-        //System.out.println(R.dump());
+        model3d = model;
+        ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue = new ArrayList<>();
 
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
-
             MatOfPoint3f pointsToProject = poly.getPoints();
 
-            Mat jacobian = new Mat();
-            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, jacobian);
-
+            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
 
             if (!isVisible(points2f))
                 continue;
+
+            renderQueue.add(new Pair<>(poly, points2f));
 
             ArrayList<MatOfPoint> pointsList = new ArrayList<>();
             pointsList.add(
@@ -79,11 +77,9 @@ public class Renderer {
                     pointsList,
                     poly.getColor()
             );
-
-
-            //System.out.println(poly);
         }
-        //System.out.println("zvec2: " + zVec.dump() + "\n//");
+
+        correctRenderOrder(renderQueue);
     }
 
     public boolean isVisible(MatOfPoint2f points2f) {
@@ -100,6 +96,49 @@ public class Renderer {
 
 
         return cross.get(0, 2)[0] > 0;
+    }
+
+    public void correctRenderOrder(ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
+        System.out.println("before: ");
+        renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
+        System.out.println();
+
+        for (Pair<ArrayList<Integer>, ArrayList<Integer>> correction : model3d.getRenderCorrections()) {
+            ArrayList<Integer> idxesOfBacks = new ArrayList<>();
+            int countOfAppeared = 0;
+
+            int polyIdx = 0;
+            for (Pair<Polygon, MatOfPoint2f> renderPoly : renderQueue) {
+                Polygon poly = renderPoly.getKey();
+
+                if (correction.getKey().contains(poly.getFace())) {
+                    countOfAppeared++;
+                }else if (correction.getValue().contains(poly.getFace())) {
+                    idxesOfBacks.add(polyIdx);
+                }
+
+                polyIdx++;
+            }
+
+            if (countOfAppeared == correction.getKey().size()) {
+                ArrayList<Pair<Polygon, MatOfPoint2f>> newRenderQueue = new ArrayList<>();
+
+                for (Integer i : idxesOfBacks) {
+                    newRenderQueue.add(renderQueue.get(i));
+                }
+
+                for (int itl = 0; itl < renderQueue.size(); ++itl) {
+                    if (!idxesOfBacks.contains(itl)) {
+                        newRenderQueue.add(renderQueue.get(itl));
+                    }
+                }
+
+                renderQueue = newRenderQueue;
+            }
+        }
+
+        renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
+        System.out.println();
     }
 
     private int getFourth(MatOfPoint points, int left, int right) {
