@@ -80,7 +80,6 @@ public class Renderer {
                     poly.getColor()
             );
 
-            break;
 
             //System.out.println(poly);
         }

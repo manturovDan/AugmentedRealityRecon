@@ -10,7 +10,6 @@ public class Polygon {
     private MatOfPoint3f points;
     private ArrayList<Point3> prevPoints;
     private Scalar color;
-    private boolean odd;
 
     public Polygon(Scalar _color) {
         color = _color;
@@ -21,13 +20,6 @@ public class Polygon {
         prevPoints.add(new Point3(new double[] {pnt[0], pnt[1], pnt[2], 1.}));
     }
 
-    public void setOdd(boolean isOdd) {
-        odd = isOdd;
-    }
-
-    public boolean isOdd() {
-        return odd;
-    }
 
     public void build() {
         if (prevPoints.size() < 3)
@@ -88,7 +80,7 @@ public class Polygon {
             retStr.append("points: ").append(points.dump()).append("\n");
         }
         retStr.append("color: ").append(color).append("\n");
-        retStr.append("normal: ").append(getNormal().dump()).append("\n").append("odd: ").append(odd).append("\n}");
+        retStr.append("normal: ").append(getNormal().dump()).append("\n}");
         return retStr.toString();
     }
 }
