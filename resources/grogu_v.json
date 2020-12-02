@@ -387,6 +387,10 @@
     {
       "if_visible" : [2],
       "render_last" : [23, 231]
+    },
+    {
+      "if_visible" : [-43],
+      "render_last" : [56, 57, 58, 59]
     }
   ]
 }

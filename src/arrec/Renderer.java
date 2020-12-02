@@ -137,7 +137,7 @@ public class Renderer {
             for (Pair<Polygon, MatOfPoint2f> renderPoly : renderQueue) {
                 Polygon poly = renderPoly.getKey();
 
-                if (correction.getKey().contains(poly.getFace())) {
+                if (correction.getKey().contains(poly.getFace()) || correction.getKey().contains(-poly.getFace())) {
                     countOfAppeared++;
                 }else if (correction.getValue().contains(poly.getFace())) {
                     idxesOfBacks.add(polyIdx);
@@ -146,7 +146,8 @@ public class Renderer {
                 polyIdx++;
             }
 
-            if (countOfAppeared == correction.getKey().size()) {
+            if (countOfAppeared == correction.getKey().size() && correction.getKey().get(0) > 0 ||
+                    countOfAppeared == 0 && correction.getKey().get(0) < 0) {
                 ArrayList<Pair<Polygon, MatOfPoint2f>> newRenderQueue = new ArrayList<>(renderQueue.size());
 
                 for (Integer i : idxesOfBacks) {
