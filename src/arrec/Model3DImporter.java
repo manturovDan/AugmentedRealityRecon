@@ -2,14 +2,13 @@ package arrec;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Map;
 
 import javafx.util.Pair;
 import org.json.*;
 import org.opencv.core.Scalar;
 
 public class Model3DImporter {
-    private File jsonModelFile;
+    private final File jsonModelFile;
 
     public Model3DImporter(File modelFile) {
         jsonModelFile = modelFile;

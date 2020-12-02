@@ -3,7 +3,6 @@ package arrec;
 import org.opencv.core.Core;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainController {
@@ -11,7 +10,7 @@ public class MainController {
         System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
     }
 
-    private File calibrationFile;
+    private final File calibrationFile;
     private int camIdx = 0;
 
     public MainController(int camId, File camCalibration) {
@@ -59,7 +58,6 @@ public class MainController {
 
             gui.updateSnap(renderer.MatToImg(snapshot.getImage()));
 
-            //renderer.printMarkersInfo(snapshot);
             TimeUnit.MILLISECONDS.sleep(30);
         }
     }

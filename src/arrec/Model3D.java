@@ -5,8 +5,8 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 
 public class Model3D {
-    private ArrayList<Polygon> polygons;
-    private ArrayList<Pair<ArrayList<Integer>, ArrayList<Integer>>> renderCorrections;
+    private final ArrayList<Polygon> polygons;
+    private final ArrayList<Pair<ArrayList<Integer>, ArrayList<Integer>>> renderCorrections;
 
     public Model3D(ArrayList<Polygon> _poly, ArrayList<Pair<ArrayList<Integer>, ArrayList<Integer>>> _renderCorrections) {
         polygons = _poly;

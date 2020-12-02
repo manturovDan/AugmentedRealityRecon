@@ -1,16 +1,14 @@
 package arrec;
 
-import javafx.geometry.Point3D;
 import org.opencv.core.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Polygon {
     private MatOfPoint3f points;
-    private ArrayList<Point3> prevPoints;
-    private Scalar color;
-    private int face;
+    private final ArrayList<Point3> prevPoints;
+    private final Scalar color;
+    private final int face;
 
     public Polygon(Scalar _color, int _face) {
         color = _color;

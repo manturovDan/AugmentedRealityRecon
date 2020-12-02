@@ -1,8 +1,6 @@
 package arrec;
 
-import javafx.scene.Group;
 import javafx.scene.image.Image;
-import javafx.scene.shape.Sphere;
 import javafx.util.Pair;
 import org.opencv.aruco.Aruco;
 import org.opencv.core.*;
@@ -11,10 +9,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.calib3d.*;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
 
 public class Renderer {
     private Model3D model3d;
@@ -61,22 +56,6 @@ public class Renderer {
                 continue;
 
             renderQueue.add(new Pair<>(poly, points2f));
-/*
-            ArrayList<MatOfPoint> pointsList = new ArrayList<>();
-            pointsList.add(
-                    new MatOfPoint (
-                            points2f.toArray()[0],
-                            points2f.toArray()[1],
-                            points2f.toArray()[2],
-                            points2f.toArray()[3]
-                    )
-            );
-
-            Imgproc.fillPoly (
-                    image,
-                    pointsList,
-                    poly.getColor()
-            );*/
         }
 
         renderQueue = correctRenderOrder(renderQueue);
@@ -170,26 +149,6 @@ public class Renderer {
         return renderQueue;
     }
 
-    private int getFourth(MatOfPoint points, int left, int right) {
-        double x = points.toArray()[left].x - points.toArray()[right].x;
-        double y = points.toArray()[left].y - points.toArray()[right].y;
-        //System.out.println("{ " + x + ", " + y + " }");
-
-        if (x > 0) {
-            if (y > 0) {
-                return 1;
-            } else {
-                return 4;
-            }
-        } else {
-            if (y > 0) {
-                return 2;
-            } else {
-                return 3;
-            }
-        }
-    }
-
     @DebugAnno
     public void drawAxis(Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         Mat curTvec = new Mat();
@@ -197,55 +156,6 @@ public class Renderer {
 
         double[] curTvecVal = curTvec.get(0, 0);
         //curTvecVal[0] += 0.1;
-
-        /*Imgproc.rectangle (
-            image,
-            new Point(230, 160),
-            new Point(250, 180),
-            new Scalar(0, 0, 255),
-            -1
-        );
-
-        MatOfPoint3f pointsToProject = new MatOfPoint3f(
-                new Point3(new double[] { 0.039999999, 0.039999999, 0, 1 }),
-                new Point3(new double[] { -0.039999999, 0.039999999, 0, 1 }),
-                new Point3(new double[] { -0.039999999, -0.039999999, .0, 1 }),
-                new Point3(new double[] { 0.039999999, -0.039999999, 0., 1 }));
-
-        MatOfPoint2f points2f = new MatOfPoint2f();
-        Mat jacobian = new Mat();
-
-        Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, jacobian);
-
-        Imgproc.circle (
-                image,                 //Matrix obj of the image
-                points2f.toArray()[0],    //Center of the circle
-                0,                    //Radius
-                new Scalar(0, 255, 255),  //Scalar object for color
-                10                      //Thickness of the circle
-        );
-
-        ArrayList<MatOfPoint> list = new ArrayList();
-        list.add(
-                new MatOfPoint (
-                        points2f.toArray()[0],
-                        points2f.toArray()[1],
-                        points2f.toArray()[2],
-                        points2f.toArray()[3]
-                )
-        );
-
-
-        Imgproc.fillPoly (
-                image,
-                list,
-                new Scalar(0, 255, 255)
-        );
-
-        //System.out.println(points2f.dump());
-        curTvec.put(0, 0, curTvecVal);
-
-        //System.out.println(tvec.dump());*/
 
         Aruco.drawAxis(image, camMatrix, dstMatrix, rvec, curTvec, 0.1f);
     }

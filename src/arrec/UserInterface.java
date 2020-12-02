@@ -1,22 +1,11 @@
 package arrec;
 
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
-import javafx.stage.Window;
-
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.highgui.*;
-import org.opencv.imgcodecs.Imgcodecs;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
 public class UserInterface extends Application implements Runnable {

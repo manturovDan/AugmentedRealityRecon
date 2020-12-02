@@ -5,11 +5,11 @@ import org.opencv.core.Mat;
 import java.util.ArrayList;
 
 public class VisionResult {
-    private Mat image;
-    private ArrayList<Mat> corners;
-    private Mat ids;
-    private Mat rvecs;
-    private Mat tvecs;
+    private final Mat image;
+    private final ArrayList<Mat> corners;
+    private final Mat ids;
+    private final Mat rvecs;
+    private final Mat tvecs;
 
     private VisionResult(Mat _image, ArrayList<Mat> _corners, Mat _ids, Mat _rvecs, Mat _tvecs) {
         image = _image;

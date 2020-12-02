@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CamParamsReader {
-    private File kFile;
+    private final File kFile;
     private Mat cameraMatrix;
     private Mat dstMatrix;
 

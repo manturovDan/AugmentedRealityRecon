@@ -19,6 +19,7 @@ public class Vision implements Runnable {
     private Dictionary dict;
     private boolean isHandling;
     private Mat image;
+    private long timeOfWaitingStart = 0;
 
     private ArrayList<Mat> corners;
     private Mat ids;
@@ -63,11 +64,21 @@ public class Vision implements Runnable {
             ids = new Mat();
             Aruco.detectMarkers(image, dict, corners, ids);
 
-            if (ids.size(0) > 0) {
+            if (ids.size(0) > 0 && Double.compare(ids.get(0, 0)[0], 23) == 0) {
                 rvecs = new Mat();
                 tvecs = new Mat();
 
                 Aruco.estimatePoseSingleMarkers(corners, 0.13f, camMatrix, dstMatrix, rvecs, tvecs);
+                timeOfWaitingStart = 0;
+            }
+            else if (timeOfWaitingStart > 0) {
+                if (System.currentTimeMillis() - timeOfWaitingStart > 1000) {
+                    rvecs = null;
+                    tvecs = null;
+                }
+            }
+            else {
+                timeOfWaitingStart = System.currentTimeMillis();
             }
 
             setCalculationResults();
