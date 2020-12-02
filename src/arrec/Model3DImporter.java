@@ -75,7 +75,7 @@ public class Model3DImporter {
         }
 
         Model3D model = new Model3D(Model3DPoly, renderCorrectionsCV);
-        //System.out.println(model);
+        System.out.println(model);
         return model;
     }
 

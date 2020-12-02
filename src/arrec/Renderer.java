@@ -125,7 +125,7 @@ public class Renderer {
                 polyIdx++;
             }
 
-            if (countOfAppeared == correction.getKey().size() && correction.getKey().get(0) > 0 ||
+            if (countOfAppeared == correction.getKey().size() && correction.getKey().get(0) >= 0 ||
                     countOfAppeared == 0 && correction.getKey().get(0) < 0) {
                 ArrayList<Pair<Polygon, MatOfPoint2f>> newRenderQueue = new ArrayList<>(renderQueue.size());
 
