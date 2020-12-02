@@ -87,6 +87,10 @@ public class Vision implements Runnable {
         }
     }
 
+    public synchronized void noHandle() {
+        isHandling = false;
+    }
+
     @Override
     public void run() {
         try {

@@ -13,6 +13,7 @@ public class UserInterface extends Application implements Runnable {
     private static int width;
     private static ImageView imgView;
     private static Group root;
+    private static boolean closed = false;
 
     public void setHeight(int _height) {
         height = _height;
@@ -44,14 +45,20 @@ public class UserInterface extends Application implements Runnable {
         Application.launch();
     }
 
+    @Override
+    public void stop() {
+        closed = true;
+    }
+
+
+    public static synchronized boolean getClosed() {
+        return closed;
+    }
+
     public synchronized void updateSnap(Image image) {
         if (imgView != null) {
             imgView.setImage(image);
         }
-    }
-
-    public static void main(String[] args) {
-        Application.launch();
     }
 
 

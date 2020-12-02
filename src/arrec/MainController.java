@@ -11,7 +11,7 @@ public class MainController {
     }
 
     private final File calibrationFile;
-    private int camIdx = 0;
+    private int camIdx;
 
     public MainController(int camId, File camCalibration) {
         calibrationFile = camCalibration;
@@ -44,7 +44,7 @@ public class MainController {
 
         VisionResult snapshot;
 
-        while (true) {
+        while (!UserInterface.getClosed()) {
             snapshot = vision.getResult();
             if (snapshot == null) { //is not loaded yet
                 TimeUnit.MILLISECONDS.sleep(100);
@@ -60,5 +60,10 @@ public class MainController {
 
             TimeUnit.MILLISECONDS.sleep(30);
         }
+
+        guiThread.interrupt();
+        vision.noHandle();
+        visThread.join();
+
     }
 }
