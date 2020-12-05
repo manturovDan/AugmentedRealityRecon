@@ -59,7 +59,6 @@ public class Vision implements Runnable {
 
         while (isHandling && inputVideo.grab()) {
             inputVideo.retrieve(image);
-
             corners = new ArrayList<>();
             ids = new Mat();
             Aruco.detectMarkers(image, dict, corners, ids);

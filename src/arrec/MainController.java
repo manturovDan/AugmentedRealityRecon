@@ -43,7 +43,6 @@ public class MainController {
         //System.out.print(showingModel);
 
         VisionResult snapshot;
-
         while (!UserInterface.getClosed()) {
             snapshot = vision.getResult();
             if (snapshot == null) { //is not loaded yet
@@ -64,6 +63,5 @@ public class MainController {
         guiThread.interrupt();
         vision.noHandle();
         visThread.join();
-
     }
 }
