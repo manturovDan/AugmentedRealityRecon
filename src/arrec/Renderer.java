@@ -45,6 +45,25 @@ public class Renderer {
     public void drawModel(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         model3d = model;
         ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue = new ArrayList<>();
+        Mat rtMat = new Mat(4, 4, CvType.CV_64FC1);
+
+        Mat rotationMat = new Mat();
+        Calib3d.Rodrigues(rvec, rotationMat);
+
+        for (int r = 0; r < 3; ++r) {
+            for (int c = 0; c < 3; ++c) {
+                rtMat.put(r, c, rotationMat.get(r, c));
+            }
+        }
+
+        System.out.println(tvec.dump());
+        for (int i = 0; i < 3; ++i) {
+            rtMat.put(i, 3, tvec.get(0, 0)[i]);
+            rtMat.put(3, i, 0);
+        }
+        rtMat.put(3, 3, 1);
+
+        System.out.println(rtMat.dump());
 
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
@@ -58,7 +77,7 @@ public class Renderer {
             renderQueue.add(new Pair<>(poly, points2f));
         }
 
-        renderQueue = correctRenderOrder(renderQueue);
+        //renderQueue = correctRenderOrder(renderQueue);
 
         drawQueue(image, renderQueue);
     }
