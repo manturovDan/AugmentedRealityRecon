@@ -32,24 +32,29 @@ public class Mathematical {
         return rtMat;
     }
 
-    public static void getNormalPlaneByPoints(Mat p1, Mat p2, Mat p3, Double A, Double B, Double C) {
+    public static void getNormalPlaneByPoints(Mat p1, Mat p2, Mat p3, ArrayList<Double> planeCoefs) {
         System.out.println(p1.dump());
         System.out.println(p2.dump());
         System.out.println(p3.dump());
-/*
-        double a1 = x2 - x1;
-        double b1 = y2 - y1;
-        double c1 = z2 - z1;
-        double a2 = x3 - x1;
-        double b2 = y3 - y1;
-        double c2 = z3 - z1;
+
+        double a1 = p2.get(0,0)[0] - p1.get(0,0)[0]; //x2 - x1
+        double b1 = p2.get(1,0)[0] - p1.get(1,0)[0]; //y2 - y1
+        double c1 = p2.get(2,0)[0] - p1.get(2,0)[0]; //z2 - z1
+        double a2 = p3.get(0,0)[0] - p1.get(0,0)[0]; //x3 - x1
+        double b2 = p3.get(1,0)[0] - p1.get(1,0)[0]; //y3 - y1
+        double c2 = p3.get(2,0)[0] - p1.get(2,0)[0]; //z3 - z1
+
         double a = b1 * c2 - b2 * c1;
         double b = a2 * c1 - a1 * c2;
         double c = a1 * b2 - b1 * a2;
-        double d = (- a * x1 - b * y1 - c * z1); */
+        double d = (- a * p1.get(0,0)[0] - b * p1.get( 1,0)[0] - c * p1.get(2,0)[0]); //(- a * x1 - b * y1 - c * z1)
+
+        planeCoefs.add(0, -a / d);
+        planeCoefs.add(1, -b / d);
+        planeCoefs.add(2, -c / d);
     }
 
-    public static void getNormalPlaneByPoints(ArrayList<Mat> pointsList, Double A, Double B, Double C) {
-        getNormalPlaneByPoints(pointsList.get(0), pointsList.get(1), pointsList.get(2), A, B, C);
+    public static void getNormalPlaneByPoints(ArrayList<Mat> pointsList, ArrayList<Double> planeCoefs) {
+        getNormalPlaneByPoints(pointsList.get(0), pointsList.get(1), pointsList.get(2), planeCoefs);
     }
 }

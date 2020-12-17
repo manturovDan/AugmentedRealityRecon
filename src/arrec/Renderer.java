@@ -85,11 +85,13 @@ public class Renderer {
                         new Scalar(255, 0, 0));
             }
 
-            //Mathematical.getNormalPlaneByPoints(points2f, 0., 1., 2.) ;
+            ArrayList<Double> planeCoefs = new ArrayList<>();
+
+            Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs) ;
 
             //System.out.println(pointC.get(2, 0)[0]);
 
-
+            System.out.println(planeCoefs);
             renderQueue.add(new Pair<>(poly, points2f));
             break;
         }
