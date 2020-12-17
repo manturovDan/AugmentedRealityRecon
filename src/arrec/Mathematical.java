@@ -1,0 +1,55 @@
+package arrec;
+
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class Mathematical {
+    public static Mat getRTMat(Mat tvec, Mat rvec) {
+        Mat rtMat = new Mat(4, 4, CvType.CV_64FC1);
+
+        Mat rotationMat = new Mat();
+        Calib3d.Rodrigues(rvec, rotationMat);
+
+        for (int r = 0; r < 3; ++r) {
+            for (int c = 0; c < 3; ++c) {
+                rtMat.put(r, c, rotationMat.get(r, c));
+            }
+        }
+
+        //System.out.println(tvec.dump());
+        for (int i = 0; i < 3; ++i) {
+            rtMat.put(i, 3, tvec.get(0, 0)[i]);
+            rtMat.put(3, i, 0);
+        }
+        rtMat.put(3, 3, 1);
+
+        return rtMat;
+    }
+
+    public static void getNormalPlaneByPoints(Mat p1, Mat p2, Mat p3, Double A, Double B, Double C) {
+        System.out.println(p1.dump());
+        System.out.println(p2.dump());
+        System.out.println(p3.dump());
+/*
+        double a1 = x2 - x1;
+        double b1 = y2 - y1;
+        double c1 = z2 - z1;
+        double a2 = x3 - x1;
+        double b2 = y3 - y1;
+        double c2 = z3 - z1;
+        double a = b1 * c2 - b2 * c1;
+        double b = a2 * c1 - a1 * c2;
+        double c = a1 * b2 - b1 * a2;
+        double d = (- a * x1 - b * y1 - c * z1); */
+    }
+
+    public static void getNormalPlaneByPoints(ArrayList<Mat> pointsList, Double A, Double B, Double C) {
+        getNormalPlaneByPoints(pointsList.get(0), pointsList.get(1), pointsList.get(2), A, B, C);
+    }
+}

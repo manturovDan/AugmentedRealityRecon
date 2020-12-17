@@ -45,56 +45,53 @@ public class Renderer {
     public void drawModel(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         model3d = model;
         ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue = new ArrayList<>();
-        Mat rtMat = new Mat(4, 4, CvType.CV_64FC1);
 
-        Mat rotationMat = new Mat();
-        Calib3d.Rodrigues(rvec, rotationMat);
-
-        for (int r = 0; r < 3; ++r) {
-            for (int c = 0; c < 3; ++c) {
-                rtMat.put(r, c, rotationMat.get(r, c));
-            }
-        }
-
-        //System.out.println(tvec.dump());
-        for (int i = 0; i < 3; ++i) {
-            rtMat.put(i, 3, tvec.get(0, 0)[i]);
-            rtMat.put(3, i, 0);
-        }
-        rtMat.put(3, 3, 1);
+        Mat rtMat = Mathematical.getRTMat(tvec, rvec);
 
         //System.out.println(rtMat.dump());
 
-        boolean wasPoint = false;
-
+        ArrayList<Mat> planePoints = new ArrayList<>();
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
             MatOfPoint3f pointsToProject = poly.getPoints();
 
-            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
+            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), points2f, new Mat());
 
             if (!isVisible(points2f))
                 continue;
 
-            if (!wasPoint) {
-                wasPoint = true;
-                Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
-                coordsMat.put(0, 0, pointsToProject.get(0, 0));
-                coordsMat.put(3, 0, 1);
-                Mat pointC = new Mat();
-                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, pointC);
+            Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
+            coordsMat.put(3, 0, 1);
+
+            Mat[] points = new Mat[3];
+            for (int i = 0; i < 3; ++i) {
+                points[i] = new Mat();
+                coordsMat.put(0, 0, pointsToProject.get(i, 0));
+                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, points[i]);
+                planePoints.add(points[i]);
+
 
                 Imgproc.circle(image,
-                        new Point(points2f.get(0, 0)[0], points2f.get(0, 0)[1]),
+                        new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
                         5,
                         new Scalar(255, 0, 0),
                         -1);
 
-
-                System.out.println(pointC.get(2, 0)[0]);
+                Imgproc.putText(image,
+                        "---------> " + (int) points2f.get(i, 0)[0] + " " + (int) points2f.get(i, 0)[1] + " " + points[i].get(2, 0)[0],
+                        new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
+                        5,
+                        1.,
+                        new Scalar(255, 0, 0));
             }
 
+            //Mathematical.getNormalPlaneByPoints(points2f, 0., 1., 2.) ;
+
+            //System.out.println(pointC.get(2, 0)[0]);
+
+
             renderQueue.add(new Pair<>(poly, points2f));
+            break;
         }
 
         //renderQueue = correctRenderOrder(renderQueue);
