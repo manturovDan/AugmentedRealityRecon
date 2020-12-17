@@ -56,14 +56,16 @@ public class Renderer {
             }
         }
 
-        System.out.println(tvec.dump());
+        //System.out.println(tvec.dump());
         for (int i = 0; i < 3; ++i) {
             rtMat.put(i, 3, tvec.get(0, 0)[i]);
             rtMat.put(3, i, 0);
         }
         rtMat.put(3, 3, 1);
 
-        System.out.println(rtMat.dump());
+        //System.out.println(rtMat.dump());
+
+        boolean wasPoint = false;
 
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
@@ -73,6 +75,24 @@ public class Renderer {
 
             if (!isVisible(points2f))
                 continue;
+
+            if (!wasPoint) {
+                wasPoint = true;
+                Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
+                coordsMat.put(0, 0, pointsToProject.get(0, 0));
+                coordsMat.put(3, 0, 1);
+                Mat pointC = new Mat();
+                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, pointC);
+
+                Imgproc.circle(image,
+                        new Point(points2f.get(0, 0)[0], points2f.get(0, 0)[1]),
+                        5,
+                        new Scalar(255, 0, 0),
+                        -1);
+
+
+                System.out.println(pointC.get(2, 0)[0]);
+            }
 
             renderQueue.add(new Pair<>(poly, points2f));
         }
@@ -177,5 +197,19 @@ public class Renderer {
         //curTvecVal[0] += 0.1;
 
         Aruco.drawAxis(image, camMatrix, dstMatrix, rvec, curTvec, 0.1f);
+
+        MatOfPoint2f points2f = new MatOfPoint2f();
+        System.out.println(tvec.dump());
+        System.out.println(new MatOfPoint3f(new Point3(tvec.get(0, 0))).dump());
+        Calib3d.projectPoints(new MatOfPoint3f(new Point3(tvec.get(0,0))), rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
+
+        System.out.println(points2f.dump());
+
+        Imgproc.circle(
+                image,
+                new Point(points2f.get(0, 0)[0] / 10, -points2f.get(0, 0)[1] / 10),
+                2,
+                new Scalar(255, 0, 0)
+        );
     }
 }
