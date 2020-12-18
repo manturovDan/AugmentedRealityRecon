@@ -83,13 +83,27 @@ public class Renderer {
                         5,
                         1.,
                         new Scalar(255, 0, 0));
+
+
             }
 
+            System.out.println("#");
+            System.out.println(new Point(points[0].get(0,0)[0] / points[0].get(2,0)[0] ,
+                    points[0].get(1,0)[0] / points[0].get(2,0)[0]));
+            System.out.println(new Point(points[1].get(0,0)[0] / points[1].get(2,0)[0] ,
+                    points[1].get(1,0)[0] / points[1].get(2,0)[0]));
+
+            Imgproc.line(image, new Point(points[0].get(0,0)[0] / points[0].get(2,0)[0] ,
+                            points[0].get(1,0)[0] / points[0].get(2,0)[0]),        //p1
+
+                    new Point(points[1].get(0,0)[0] / points[1].get(2,0)[0] ,
+                            points[1].get(1,0)[0] / points[1].get(2,0)[0]),       //p2
+                    new Scalar(0, 0, 255),     //Scalar object for color
+                    5 );
+
             ArrayList<Double> planeCoefs = new ArrayList<>();
+            Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs);
 
-            Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs) ;
-
-            //System.out.println(pointC.get(2, 0)[0]);
 
             System.out.println(planeCoefs);
             renderQueue.add(new Pair<>(poly, points2f));
@@ -98,7 +112,7 @@ public class Renderer {
 
         //renderQueue = correctRenderOrder(renderQueue);
 
-        drawQueue(image, renderQueue);
+        //drawQueue(image, renderQueue);
     }
 
     private void drawQueue(Mat image, ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
