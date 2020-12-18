@@ -54,6 +54,32 @@ public class Mathematical {
         planeCoefs.add(2, -c / d);
     }
 
+    static void equation_plane(double x1, double y1,
+                               double z1, double x2,
+                               double y2, double z2,
+                               double x3, double y3,
+                               double z3)
+    {
+
+        System.out.println(x1 + " " + y1 + " " + z1);
+        System.out.println(x2 + " " + y2 + " " + z3);
+        System.out.println(x3 + " " + y3 + " " + z3);
+
+        double a1 = x2 - x1;
+        double b1 = y2 - y1;
+        double c1 = z2 - z1;
+        double a2 = x3 - x1;
+        double b2 = y3 - y1;
+        double c2 = z3 - z1;
+        double a = b1 * c2 - b2 * c1;
+        double b = a2 * c1 - a1 * c2;
+        double c = a1 * b2 - b1 * a2;
+        double d = (- a * x1 - b * y1 - c * z1);
+        System.out.println("equation of plane is " + a / -d +
+                " x + " + b / -d + " y + " + c / -d +
+                " z + " + d / -d + " = 0.");
+    }
+
     public static void getNormalPlaneByPoints(ArrayList<Mat> pointsList, ArrayList<Double> planeCoefs) {
         getNormalPlaneByPoints(pointsList.get(0), pointsList.get(1), pointsList.get(2), planeCoefs);
     }

@@ -9,6 +9,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.calib3d.*;
 
 import java.io.ByteArrayInputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Renderer {
@@ -51,6 +52,8 @@ public class Renderer {
         //System.out.println(rtMat.dump());
 
         ArrayList<Mat> planePoints = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("####0.0000000");
+
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
             MatOfPoint3f pointsToProject = poly.getPoints();
@@ -78,7 +81,9 @@ public class Renderer {
                         -1);
 
                 Imgproc.putText(image,
-                        "---------> " + (int) points2f.get(i, 0)[0] + " " + (int) points2f.get(i, 0)[1] + " " + points[i].get(2, 0)[0],
+                        "----> " + df.format(points[i].get(0, 0)[0]) +
+                                " " + df.format(points[i].get(1, 0)[0]) +
+                                " " + df.format(points[i].get(2, 0)[0]),
                         new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
                         5,
                         1.,
@@ -86,7 +91,7 @@ public class Renderer {
 
 
             }
-
+/*
             System.out.println("#");
             System.out.println(new Point(points[0].get(0,0)[0] / points[0].get(2,0)[0] ,
                     points[0].get(1,0)[0] / points[0].get(2,0)[0]));
@@ -100,12 +105,17 @@ public class Renderer {
                             points[1].get(1,0)[0] / points[1].get(2,0)[0]),       //p2
                     new Scalar(0, 0, 255),     //Scalar object for color
                     5 );
-
+*/
             ArrayList<Double> planeCoefs = new ArrayList<>();
             Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs);
 
-
+            System.out.println("Plane coefs:");
             System.out.println(planeCoefs);
+
+            Mathematical.equation_plane(planePoints.get(0).get(0, 0)[0], planePoints.get(0).get(1, 0)[0], planePoints.get(0).get(2, 0)[0],
+                    planePoints.get(1).get(0, 0)[0], planePoints.get(1).get(1, 0)[0], planePoints.get(1).get(2, 0)[0],
+                    planePoints.get(2).get(0, 0)[0], planePoints.get(2).get(1, 0)[0], planePoints.get(2).get(2, 0)[0]);
+
             renderQueue.add(new Pair<>(poly, points2f));
             break;
         }
