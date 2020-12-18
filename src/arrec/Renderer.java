@@ -71,24 +71,66 @@ public class Renderer {
             if (!isVisible(vertices))
                 continue;
 
-            MatOfPoint3f allPointsInPolygon = poly.getInternalPoints();
-            MatOfPoint2f points2f = new MatOfPoint2f();
-            Calib3d.projectPoints(allPointsInPolygon, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), points2f, new Mat());
+            for (Point3 point : verticesPointsToProject.toArray()) {
+                //double zCam = getCamCoords(rtMat, new double[] {point.x, point.y, point.z})[2];
+
+                int[] point0 = new int[] { (int)vertices.get(0, 0)[0], (int)vertices.get(0, 0)[1] };
+                int[] point1 = new int[] { (int)vertices.get(1, 0)[0], (int)vertices.get(1, 0)[1] };
+                int[] point2 = new int[] { (int)vertices.get(2, 0)[0], (int)vertices.get(2, 0)[1] };
+                int[] point3 = new int[] { (int)vertices.get(3, 0)[0], (int)vertices.get(3, 0)[1] };
+
+                Imgproc.circle(image, new Point(point0[0], point0[1]), 5, new Scalar(255, 255, 0),-1);
+                Imgproc.circle(image, new Point(point1[0], point1[1]), 5, new Scalar(255, 255, 0),-1);
+                Imgproc.circle(image, new Point(point2[0], point2[1]), 5, new Scalar(255, 255, 0),-1);
+
+                int minX = minCoordinate(point0, point1, point2, 0);
+                int maxX = maxCoordinate(point0, point1, point2, 0);
+
+                int minY = minCoordinate(point0, point1, point2, 1);
+                int maxY = maxCoordinate(point0, point1, point2, 1);
 
 
-            int px = 0;
-            for (Point3 point : allPointsInPolygon.toArray()) {
-                double zCam = getCamCoords(rtMat, new double[] {point.x, point.y, point.z})[2];
+                Imgproc.circle(image, new Point(minX, minY), 5, new Scalar(0, 255, 0),-1);
+                Imgproc.circle(image, new Point(maxX, maxY), 5, new Scalar(0, 255, 0),-1);
 
-                int xCoord = (int)points2f.get(px, 0)[0];
-                int yCoord = (int)points2f.get(px, 0)[1];
-                if(xCoord <= image.cols() && yCoord <= image.rows()) {
-                    image.put(yCoord, xCoord, 255, 0, 0);
-
+                for (int x = minX; x <= maxX; ++x) {
+                    for(int y = minY; y< maxY; ++y) {
+                        //if(isPointInTriangle(new int[] {x, y}, point0, point1, point2)) {
+                            image.put(y, x, 255, 0, 0);
+                        //}
+                    }
                 }
-                ++px;
             }
+
+            break;
         }
+    }
+
+    private double lineSign(int[] point0, int[] point1, int[] point2) {
+        return  (((double)point0[0]) - ((double) point2[0])) *
+                (((double)point1[1]) - ((double)point2[1])) *
+                (((double)point1[0]) - ((double)point2[0])) *
+                (((double)point0[1]) - ((double)point2[1]));
+    }
+
+    private boolean isPointInTriangle(int[] point0, int[] point1, int[] point2, int[] point) {
+        double d1 = lineSign(point, point0, point1);
+        double d2 = lineSign(point, point1, point2);
+        double d3 = lineSign(point, point2, point0);
+
+        boolean hasNeg = Double.compare(d1, 0) < 0 || Double.compare(d2, 0) < 0 || Double.compare(d3, 0) < 0;
+        boolean hasPos = Double.compare(d1, 0) > 0 || Double.compare(d2, 0) > 0 || Double.compare(d3, 0) > 0;
+
+        return !(hasNeg && hasPos);
+    }
+
+
+    private int minCoordinate(int[] point0, int[] point1, int[] point2, int axis) {
+        return Math.min(Math.min(point0[axis], point1[axis]), point2[axis]);
+    }
+
+    private int maxCoordinate(int[] point0, int[] point1, int[] point2, int axis) {
+        return Math.max(Math.max(point0[axis], point1[axis]), point2[axis]);
     }
 
     private double[][] initDepth(Mat image) {
