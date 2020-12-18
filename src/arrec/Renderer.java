@@ -73,9 +73,12 @@ public class Renderer {
                 continue;
 
             for (Point3 point : verticesPointsToProject.toArray()) {
-                //double zCam = getCamCoords(rtMat, new double[] {point.x, point.y, point.z})[2];
+                double camCoords[] = getCamCoords(rtMat, new double[] {point.x, point.y, point.z});
+                Imgproc.circle(image, new Point(camCoords[0] * camMatrix.get(0, 0)[0] / camCoords[2] + camMatrix.get(0, 2)[0],
+                        camCoords[1] * camMatrix.get(1, 1)[0] / camCoords[2] + camMatrix.get(1, 2)[0]),
+                        5, new Scalar(255, 255, 0),-1);
 
-                int[] point0 = new int[] { (int)vertices.get(0, 0)[0], (int)vertices.get(0, 0)[1] };
+                /*int[] point0 = new int[] { (int)vertices.get(0, 0)[0], (int)vertices.get(0, 0)[1] };
                 int[] point1 = new int[] { (int)vertices.get(1, 0)[0], (int)vertices.get(1, 0)[1] };
                 int[] point2 = new int[] { (int)vertices.get(2, 0)[0], (int)vertices.get(2, 0)[1] };
                 int[] point3 = new int[] { (int)vertices.get(3, 0)[0], (int)vertices.get(3, 0)[1] };
@@ -106,10 +109,8 @@ public class Renderer {
                             image.put(y, x, 255, 255, 255);
                         }
                     }
-                }
+                }*/
             }
-
-            break;
         }
     }
 
