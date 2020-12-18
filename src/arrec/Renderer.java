@@ -11,6 +11,7 @@ import org.opencv.calib3d.*;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Renderer {
     private Model3D model3d;
@@ -43,6 +44,65 @@ public class Renderer {
         return new Image(new ByteArrayInputStream(byteMat.toArray()));
     }
 
+    private double[] getCamCoords(Mat rtMat, double[] pointGlobal) {
+        Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
+        coordsMat.put(3, 0, 1);
+        double[] camPoints = new double[3];
+
+        Mat gemmMat = new Mat();
+        coordsMat.put(0, 0, pointGlobal);
+        Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, gemmMat);
+        for (int j = 0; j < 3; ++j) {
+            camPoints[j] = gemmMat.get(j, 0)[0];
+        }
+
+        return camPoints;
+    }
+
+    public void rasterization(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
+        model3d = model;
+        Mat rtMat = Mathematical.getRTMat(tvec, rvec);
+        double[][] depth = initDepth(image);
+
+        for (Polygon poly : model.getPolygons()) {
+            MatOfPoint2f vertices = new MatOfPoint2f();
+            MatOfPoint3f verticesPointsToProject = poly.getPoints();
+            Calib3d.projectPoints(verticesPointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), vertices, new Mat());
+            if (!isVisible(vertices))
+                continue;
+
+            MatOfPoint3f allPointsInPolygon = poly.getInternalPoints();
+            MatOfPoint2f points2f = new MatOfPoint2f();
+            Calib3d.projectPoints(allPointsInPolygon, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), points2f, new Mat());
+
+
+            int px = 0;
+            for (Point3 point : allPointsInPolygon.toArray()) {
+                double zCam = getCamCoords(rtMat, new double[] {point.x, point.y, point.z})[2];
+
+                int xCoord = (int)points2f.get(px, 0)[0];
+                int yCoord = (int)points2f.get(px, 0)[1];
+                if(xCoord <= image.cols() && yCoord <= image.rows()) {
+                    //image.put((int) points2f.get(px, 0)[0], (int) points2f.get(px, 0)[1], 0);
+                    Imgproc.circle(image,
+                            new Point(xCoord, yCoord),
+                            5,
+                            new Scalar(255, 0, 0),
+                            -1);
+                }
+                ++px;
+            }
+        }
+    }
+
+    private double[][] initDepth(Mat image) {
+        double[][] depth = new double[image.rows()][image.cols()];
+        for (double[] row : depth) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
+        }
+        return depth;
+    }
+
     public void drawModel(Model3D model, Mat image, Mat camMatrix, Mat dstMatrix, Mat rvec, Mat tvec) {
         model3d = model;
         ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue = new ArrayList<>();
@@ -57,7 +117,6 @@ public class Renderer {
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
             MatOfPoint3f pointsToProject = poly.getPoints();
-
             Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), points2f, new Mat());
 
             if (!isVisible(points2f))
@@ -66,13 +125,14 @@ public class Renderer {
             Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
             coordsMat.put(3, 0, 1);
 
-            Mat[] points = new Mat[3];
+            double[][] points = new double[3][3];
             for (int i = 0; i < 3; ++i) {
-                points[i] = new Mat();
+                Mat gemmMat = new Mat();
                 coordsMat.put(0, 0, pointsToProject.get(i, 0));
-                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, points[i]);
-                planePoints.add(points[i]);
-
+                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, gemmMat);
+                for (int j = 0; j < 3; ++j) {
+                    points[i][j] = gemmMat.get(j, 0)[0];
+                }
 
                 Imgproc.circle(image,
                         new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
@@ -81,9 +141,9 @@ public class Renderer {
                         -1);
 
                 Imgproc.putText(image,
-                        "----> " + df.format(points[i].get(0, 0)[0]) +
-                                " " + df.format(points[i].get(1, 0)[0]) +
-                                " " + df.format(points[i].get(2, 0)[0]),
+                        "----> " + points[i][0] +
+                                " " + points[i][1] +
+                                " " + points[i][2],
                         new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
                         5,
                         1.,
@@ -107,14 +167,15 @@ public class Renderer {
                     5 );
 */
             ArrayList<Double> planeCoefs = new ArrayList<>();
-            Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs);
+            //Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs);
 
             System.out.println("Plane coefs:");
             System.out.println(planeCoefs);
 
-            Mathematical.equation_plane(planePoints.get(0).get(0, 0)[0], planePoints.get(0).get(1, 0)[0], planePoints.get(0).get(2, 0)[0],
-                    planePoints.get(1).get(0, 0)[0], planePoints.get(1).get(1, 0)[0], planePoints.get(1).get(2, 0)[0],
-                    planePoints.get(2).get(0, 0)[0], planePoints.get(2).get(1, 0)[0], planePoints.get(2).get(2, 0)[0]);
+            Mathematical.equation_plane(points[0][0], points[0][1], points[0][2],
+                                        points[1][0], points[1][1], points[1][2],
+                                        points[2][0], points[2][1], points[2][2]);
+
 
             renderQueue.add(new Pair<>(poly, points2f));
             break;

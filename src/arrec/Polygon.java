@@ -3,6 +3,7 @@ package arrec;
 import org.opencv.core.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Polygon {
     private MatOfPoint3f points;
@@ -38,6 +39,101 @@ public class Polygon {
 
     public MatOfPoint3f getPoints() {
         return points;
+    }
+
+    public MatOfPoint3f getInternalPoints() {
+        double step = 0.0001;
+        ArrayList<Point3> allPolyPoints = new ArrayList<>();
+
+        if (!areVerticesXEq()) {
+            double[] yBoundaries = getBoundaries(1);
+            double[] zBoundaries = getBoundaries(2);
+            double xVal = points.get(0, 0)[0];
+
+            for (double currentY = yBoundaries[0];
+                Double.compare(currentY, yBoundaries[1]) <= 0;
+                currentY += step) {
+
+                for (double currentZ = zBoundaries[0];
+                    Double.compare(currentZ, zBoundaries[1]) <= 0;
+                    currentZ += step) {
+
+                    allPolyPoints.add(new Point3(xVal, currentY, currentZ));
+                }
+            }
+        }
+        else if (!areVerticesYEq()) {
+            double[] xBoundaries = getBoundaries(0);
+            double[] zBoundaries = getBoundaries(2);
+            double yVal = points.get(0, 0)[1];
+
+            for (double currentX = xBoundaries[0];
+                 Double.compare(currentX, xBoundaries[1]) <= 0;
+                 currentX += step) {
+
+                for (double currentZ = zBoundaries[0];
+                     Double.compare(currentZ, zBoundaries[1]) <= 0;
+                     currentZ += step) {
+
+                    allPolyPoints.add(new Point3(currentX, yVal, currentZ));
+                }
+            }
+        }
+        else if (!areVerticesZEq()) {
+            double[] xBoundaries = getBoundaries(0);
+            double[] yBoundaries = getBoundaries(1);
+            double zVal = points.get(0, 0)[2];
+
+            for (double currentX = xBoundaries[0];
+                 Double.compare(currentX, xBoundaries[1]) <= 0;
+                 currentX += step) {
+
+                for (double currentY = yBoundaries[0];
+                     Double.compare(currentY, yBoundaries[1]) <= 0;
+                     currentY += step) {
+
+                    allPolyPoints.add(new Point3(currentX, currentY, zVal));
+                }
+            }
+        }
+        else
+            throw new RuntimeException("Error 3D model storing");
+
+        MatOfPoint3f points3f = new MatOfPoint3f();
+        points3f.fromList(allPolyPoints);
+        return points3f;
+    }
+
+    private double[] getBoundaries(int coord) {
+        double[] boundary = new double[2];
+        boundary[0] = points.get(0, 0)[coord];
+        boundary[1] = points.get(1, 0)[coord];
+        boundary[1] = boundary[0] == boundary[1] ? points.get(2, 0)[coord] : boundary[1];
+
+        if (Double.compare(boundary[0], boundary[1]) > 0) {
+            double tmp = boundary[0];
+            boundary[0] = boundary[1];
+            boundary[1] = tmp;
+        }
+
+        return boundary;
+    }
+
+    public boolean areVerticesXEq() {
+        return areVerticesEq(0);
+    }
+
+    public boolean areVerticesYEq() {
+        return areVerticesEq(1);
+    }
+
+    public boolean areVerticesZEq() {
+        return areVerticesEq(2);
+    }
+
+    public boolean areVerticesEq(int vert) {
+        return Double.compare(points.get(0, 0)[vert], points.get(1, 0)[vert]) == 0 &&
+                Double.compare(points.get(2, 0)[vert], points.get(3, 0)[vert]) == 0;
     }
 
     public Mat getNormal() {
@@ -86,4 +182,6 @@ public class Polygon {
         retStr.append("normal: ").append(getNormal().dump()).append("\nface: ").append(face).append("\n}\n");
         return retStr.toString();
     }
+
+
 }
