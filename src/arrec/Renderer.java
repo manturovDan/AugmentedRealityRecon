@@ -83,12 +83,8 @@ public class Renderer {
                 int xCoord = (int)points2f.get(px, 0)[0];
                 int yCoord = (int)points2f.get(px, 0)[1];
                 if(xCoord <= image.cols() && yCoord <= image.rows()) {
-                    //image.put((int) points2f.get(px, 0)[0], (int) points2f.get(px, 0)[1], 0);
-                    Imgproc.circle(image,
-                            new Point(xCoord, yCoord),
-                            5,
-                            new Scalar(255, 0, 0),
-                            -1);
+                    image.put(yCoord, xCoord, 255, 0, 0);
+
                 }
                 ++px;
             }

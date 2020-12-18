@@ -42,10 +42,10 @@ public class Polygon {
     }
 
     public MatOfPoint3f getInternalPoints() {
-        double step = 0.0001;
+        double step = 0.01;
         ArrayList<Point3> allPolyPoints = new ArrayList<>();
 
-        if (!areVerticesXEq()) {
+        if (areVerticesXEq()) {
             double[] yBoundaries = getBoundaries(1);
             double[] zBoundaries = getBoundaries(2);
             double xVal = points.get(0, 0)[0];
@@ -62,7 +62,7 @@ public class Polygon {
                 }
             }
         }
-        else if (!areVerticesYEq()) {
+        else if (areVerticesYEq()) {
             double[] xBoundaries = getBoundaries(0);
             double[] zBoundaries = getBoundaries(2);
             double yVal = points.get(0, 0)[1];
@@ -79,7 +79,7 @@ public class Polygon {
                 }
             }
         }
-        else if (!areVerticesZEq()) {
+        else if (areVerticesZEq()) {
             double[] xBoundaries = getBoundaries(0);
             double[] yBoundaries = getBoundaries(1);
             double zVal = points.get(0, 0)[2];
@@ -133,7 +133,7 @@ public class Polygon {
 
     public boolean areVerticesEq(int vert) {
         return Double.compare(points.get(0, 0)[vert], points.get(1, 0)[vert]) == 0 &&
-                Double.compare(points.get(2, 0)[vert], points.get(3, 0)[vert]) == 0;
+                Double.compare(points.get(1, 0)[vert], points.get(2, 0)[vert]) == 0;
     }
 
     public Mat getNormal() {
