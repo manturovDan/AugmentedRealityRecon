@@ -72,44 +72,21 @@ public class Renderer {
             if (!isVisible(vertices))
                 continue;
 
-            for (Point3 point : verticesPointsToProject.toArray()) {
-                double camCoords[] = getCamCoords(rtMat, new double[] {point.x, point.y, point.z});
-                Imgproc.circle(image, new Point(camCoords[0] * camMatrix.get(0, 0)[0] / camCoords[2] + camMatrix.get(0, 2)[0],
-                        camCoords[1] * camMatrix.get(1, 1)[0] / camCoords[2] + camMatrix.get(1, 2)[0]),
-                        5, new Scalar(255, 255, 0),-1);
+            MatOfPoint3f allPointsToProject = poly.getInternalPoints();
+            for (Point3 point : allPointsToProject.toArray()) {
+                double[] camCoords = getCamCoords(rtMat, new double[] {point.x, point.y, point.z});
+                int xPx = (int) (camCoords[0] * camMatrix.get(0, 0)[0] / camCoords[2] + camMatrix.get(0, 2)[0]);
+                int yPx = (int) (camCoords[1] * camMatrix.get(1, 1)[0] / camCoords[2] + camMatrix.get(1, 2)[0]);
 
-                /*int[] point0 = new int[] { (int)vertices.get(0, 0)[0], (int)vertices.get(0, 0)[1] };
-                int[] point1 = new int[] { (int)vertices.get(1, 0)[0], (int)vertices.get(1, 0)[1] };
-                int[] point2 = new int[] { (int)vertices.get(2, 0)[0], (int)vertices.get(2, 0)[1] };
-                int[] point3 = new int[] { (int)vertices.get(3, 0)[0], (int)vertices.get(3, 0)[1] };
+                if(xPx >= image.cols() || yPx >= image.rows() || xPx < 0 || yPx < 0)
+                    continue;
 
-                Imgproc.circle(image, new Point(point0[0], point0[1]), 5, new Scalar(255, 255, 0),-1);
-                Imgproc.circle(image, new Point(point1[0], point1[1]), 5, new Scalar(255, 255, 0),-1);
-                Imgproc.circle(image, new Point(point2[0], point2[1]), 5, new Scalar(255, 255, 0),-1);
+                if (depth[yPx][xPx] >= camCoords[2]) {
+                    depth[yPx][xPx] = camCoords[2];
 
-                ArrayList<MatOfPoint> pointsList = new ArrayList<>();
-                pointsList.add(
-                        new MatOfPoint (
-                                new Point(point0[0], point0[1]),
-                                new Point(point1[0], point1[1]),
-                                new Point(point2[0], point2[1])
-                        )
-                );
-
-                for (int y = 0; y <= mask.rows(); ++y) {
-                    for (int x = 0; x <= mask.cols(); ++x) {
-                        mask.put(y, x, 0);
-                    }
+                    Imgproc.circle(image, new Point(xPx, yPx),
+                            1, poly.getColor(),-1);
                 }
-
-                Imgproc.fillPoly (mask, pointsList, new Scalar(255, 255, 255));
-                for (int y = 0; y < mask.rows(); ++y) {
-                    for (int x = 0; x < mask.cols(); ++x) {
-                        if(mask.get(y, x)[0] == 255) {
-                            image.put(y, x, 255, 255, 255);
-                        }
-                    }
-                }*/
             }
         }
     }

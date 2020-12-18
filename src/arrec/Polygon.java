@@ -42,7 +42,7 @@ public class Polygon {
     }
 
     public MatOfPoint3f getInternalPoints() {
-        double step = 0.01;
+        double step = 0.0003;
         ArrayList<Point3> allPolyPoints = new ArrayList<>();
 
         if (areVerticesXEq()) {
