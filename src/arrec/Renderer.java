@@ -63,6 +63,7 @@ public class Renderer {
         model3d = model;
         Mat rtMat = Mathematical.getRTMat(tvec, rvec);
         double[][] depth = initDepth(image);
+        Mat mask = new Mat(image.rows(), image.cols(), CvType.CV_64FC1);
 
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f vertices = new MatOfPoint2f();
@@ -83,21 +84,27 @@ public class Renderer {
                 Imgproc.circle(image, new Point(point1[0], point1[1]), 5, new Scalar(255, 255, 0),-1);
                 Imgproc.circle(image, new Point(point2[0], point2[1]), 5, new Scalar(255, 255, 0),-1);
 
-                int minX = minCoordinate(point0, point1, point2, 0);
-                int maxX = maxCoordinate(point0, point1, point2, 0);
+                ArrayList<MatOfPoint> pointsList = new ArrayList<>();
+                pointsList.add(
+                        new MatOfPoint (
+                                new Point(point0[0], point0[1]),
+                                new Point(point1[0], point1[1]),
+                                new Point(point2[0], point2[1])
+                        )
+                );
 
-                int minY = minCoordinate(point0, point1, point2, 1);
-                int maxY = maxCoordinate(point0, point1, point2, 1);
+                for (int y = 0; y <= mask.rows(); ++y) {
+                    for (int x = 0; x <= mask.cols(); ++x) {
+                        mask.put(y, x, 0);
+                    }
+                }
 
-
-                Imgproc.circle(image, new Point(minX, minY), 5, new Scalar(0, 255, 0),-1);
-                Imgproc.circle(image, new Point(maxX, maxY), 5, new Scalar(0, 255, 0),-1);
-
-                for (int x = minX; x <= maxX; ++x) {
-                    for(int y = minY; y< maxY; ++y) {
-                        //if(isPointInTriangle(new int[] {x, y}, point0, point1, point2)) {
-                            image.put(y, x, 255, 0, 0);
-                        //}
+                Imgproc.fillPoly (mask, pointsList, new Scalar(255, 255, 255));
+                for (int y = 0; y < mask.rows(); ++y) {
+                    for (int x = 0; x < mask.cols(); ++x) {
+                        if(mask.get(y, x)[0] == 255) {
+                            image.put(y, x, 255, 255, 255);
+                        }
                     }
                 }
             }
