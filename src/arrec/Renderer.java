@@ -83,13 +83,13 @@ public class Renderer {
             if (!isVisible(vertices2f))
                 continue;
 
-            for (int v = 0; v < 3; ++v) {
-                Imgproc.circle(image, new Point(projections[v].x, projections[v].y),
-                        5, new Scalar(0, 0, 255), -1);
-            }
+            //for (int v = 0; v < 3; ++v) {
+            //    Imgproc.circle(image, new Point(projections[v].x, projections[v].y),
+            //            5, new Scalar(0, 0, 255), -1);
+            //}
 
 
-            System.out.println("plane vertices: " + Arrays.toString(camCoordinates));
+            //System.out.println("plane vertices: " + Arrays.toString(camCoordinates));
             Mat plane = Mathematical.getPlaneCoefficients(camCoordinates[0].x, camCoordinates[0].y, camCoordinates[0].z,
                                         camCoordinates[1].x, camCoordinates[1].y, camCoordinates[1].z,
                                         camCoordinates[2].x, camCoordinates[2].y, camCoordinates[2].z); //Ax+By+Cz=1
@@ -105,8 +105,17 @@ public class Renderer {
                     if (isPointInsideTriangle(new Point(x, y), projections[0], projections[1], projections[2]) ||
                             isPointInsideTriangle(new Point(x, y), projections[0], projections[3], projections[2])) {
 
-                        Imgproc.circle(image, new Point(x, y),
-                                1, poly.getColor(),-1);
+                        //Imgproc.circle(image, new Point(x, y),
+                         //       1, poly.getColor(),-1);
+
+                        double currentZ = Mathematical.getZ(A, B, C, x, y, camMatrix);
+
+                        if (depth[y][x] >= currentZ) {
+                            depth[y][x] = currentZ;
+
+                            Imgproc.circle(image, new Point(x, y),
+                                    1, poly.getColor(),-1);
+                        }
 
                     }
                 }
@@ -129,7 +138,6 @@ public class Renderer {
                 }
             }*/
 
-            break;
         }
     }
 
@@ -244,11 +252,6 @@ public class Renderer {
 
             System.out.println("Plane coefs:");
             System.out.println(planeCoefs);
-
-            Mathematical.equation_plane(points[0][0], points[0][1], points[0][2],
-                                        points[1][0], points[1][1], points[1][2],
-                                        points[2][0], points[2][1], points[2][2]);
-
 
             renderQueue.add(new Pair<>(poly, points2f));
             break;
