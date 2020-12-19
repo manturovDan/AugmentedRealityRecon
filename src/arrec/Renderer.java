@@ -115,6 +115,8 @@ public class Renderer {
 
                             Imgproc.circle(image, new Point(x, y),
                                     1, poly.getColor(),-1);
+
+                            //image.put(y, x, poly.getColor().val[0], poly.getColor().val[1], poly.getColor().val[2]);
                         }
 
                     }
