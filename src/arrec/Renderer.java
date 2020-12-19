@@ -15,29 +15,6 @@ import java.util.Arrays;
 
 public class Renderer {
     private Model3D model3d;
-
-    public void printMarkersInfo(VisionResult result) {
-        if (result == null) {
-            System.out.println("null result");
-            return;
-        }
-
-        for (int i = 0; i < result.getIds().size(0); ++i) {
-            System.out.print("(" + i + ")\nCorners: ");
-            result.getCorners().forEach(e -> System.out.println(e.dump()));
-
-            System.out.print("Rvecs: ");
-            if (result.getRvecs() != null)
-                System.out.print(result.getRvecs().dump());
-
-            System.out.print("Tvecs: ");
-            if (result.getTvecs() != null)
-                System.out.print(result.getTvecs().dump());
-
-            System.out.println();
-        }
-    }
-
     public Image MatToImg(Mat image) {
         MatOfByte byteMat = new MatOfByte();
         Imgcodecs.imencode(".bmp", image, byteMat);
@@ -83,13 +60,7 @@ public class Renderer {
             if (!isVisible(vertices2f))
                 continue;
 
-            //for (int v = 0; v < 3; ++v) {
-            //    Imgproc.circle(image, new Point(projections[v].x, projections[v].y),
-            //            5, new Scalar(0, 0, 255), -1);
-            //}
 
-
-            //System.out.println("plane vertices: " + Arrays.toString(camCoordinates));
             Mat plane = Mathematical.getPlaneCoefficients(camCoordinates[0].x, camCoordinates[0].y, camCoordinates[0].z,
                                         camCoordinates[1].x, camCoordinates[1].y, camCoordinates[1].z,
                                         camCoordinates[2].x, camCoordinates[2].y, camCoordinates[2].z); //Ax+By+Cz=1
@@ -105,9 +76,6 @@ public class Renderer {
                     if (isPointInsideTriangle(new Point(x, y), projections[0], projections[1], projections[2]) ||
                             isPointInsideTriangle(new Point(x, y), projections[0], projections[3], projections[2])) {
 
-                        //Imgproc.circle(image, new Point(x, y),
-                         //       1, poly.getColor(),-1);
-
                         double currentZ = Mathematical.getZ(A, B, C, x, y, camMatrix);
 
                         if (depth[y][x] >= currentZ) {
@@ -122,24 +90,6 @@ public class Renderer {
                     }
                 }
             }
-
-            /*MatOfPoint3f allPointsToProject = poly.getInternalPoints();
-            for (Point3 point : allPointsToProject.toArray()) {
-                double[] camCoords = new double[3];
-                int[] projCoords = new int[2];
-                projectPointAndGetCameraCoordinates(rtMat, camMatrix, point, camCoords, projCoords);
-
-                if(projCoords[0] >= image.cols() || projCoords[1] >= image.rows() || projCoords[0] < 0 || projCoords[1] < 0)
-                    continue;
-
-                if (depth[projCoords[1]][projCoords[0]] >= camCoords[2]) {
-                    depth[projCoords[1]][projCoords[0]] = camCoords[2];
-
-                    Imgproc.circle(image, new Point(projCoords[0], projCoords[1]),
-                            1, poly.getColor(),-1);
-                }
-            }*/
-
         }
     }
 
@@ -176,14 +126,6 @@ public class Renderer {
         projCoords[1] = yPx;
     }
 
-
-    private int minCoordinate(int[] point0, int[] point1, int[] point2, int axis) {
-        return Math.min(Math.min(point0[axis], point1[axis]), point2[axis]);
-    }
-
-    private int maxCoordinate(int[] point0, int[] point1, int[] point2, int axis) {
-        return Math.max(Math.max(point0[axis], point1[axis]), point2[axis]);
-    }
 
     private double[][] initDepth(Mat image) {
         double[][] depth = new double[image.rows()][image.cols()];
@@ -312,10 +254,6 @@ public class Renderer {
     }
 
     private ArrayList<Pair<Polygon, MatOfPoint2f>> correctRenderOrder(ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
-        //System.out.println("before: ");
-        //renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
-        //System.out.println();
-
         for (Pair<ArrayList<Integer>, ArrayList<Integer>> correction : model3d.getRenderCorrections()) {
             ArrayList<Integer> idxesOfBacks = new ArrayList<>();
             int countOfAppeared = 0;
@@ -350,9 +288,6 @@ public class Renderer {
                 renderQueue = newRenderQueue;
             }
         }
-
-        //renderQueue.forEach(e -> System.out.print(e.getKey().getFace() + " "));
-        //System.out.println();
 
         return renderQueue;
     }

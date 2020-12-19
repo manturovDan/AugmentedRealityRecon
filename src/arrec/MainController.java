@@ -40,7 +40,6 @@ public class MainController {
         Model3DImporter mImporter = new Model3DImporter("resources/grogu_v.json");
         Model3D showingModel = mImporter.build();
 
-        //System.out.print(showingModel);
 
         VisionResult snapshot;
         while (!UserInterface.getClosed()) {
@@ -63,5 +62,6 @@ public class MainController {
         guiThread.interrupt();
         vision.noHandle();
         visThread.join();
+
     }
 }
