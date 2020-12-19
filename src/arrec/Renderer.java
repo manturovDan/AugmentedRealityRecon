@@ -148,6 +148,13 @@ public class Renderer {
     }
 
     private boolean isPointInsideTriangle(Point p, Point p0, Point p1, Point p2) {
+        if (Double.compare(p.x, Math.max(Math.max(p0.x, p1.x), p2.x)) > 0 ||
+                Double.compare(p.y, Math.max(Math.max(p0.y, p1.y), p2.y)) > 0 ||
+                Double.compare(p.x, Math.min(Math.min(p0.x, p1.x), p2.x)) < 0 ||
+                Double.compare(p.y, Math.min(Math.min(p0.y, p1.y), p2.y)) < 0
+        )
+            return false;
+
         double pp0p1 = triangleArea(p, p0, p1);
         double pp0p2 = triangleArea(p, p0, p2);
         double pp1p2 = triangleArea(p, p1, p2);
