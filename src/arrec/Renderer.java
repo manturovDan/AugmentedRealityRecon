@@ -82,9 +82,18 @@ public class Renderer {
             if (!isVisible(vertices2f))
                 continue;
 
-            for (int v = 0; v < verticesPointsToProject.rows(); ++v) {
+            for (int v = 0; v < 3; ++v) {
                 Imgproc.circle(image, new Point(projections[v].x, projections[v].y),
-                        1, poly.getColor(), -1);
+                        5, new Scalar(0, 0, 255), -1);
+            }
+
+            for (int x = 0; x < image.cols(); ++x) {
+                for (int y = 0; y < image.rows(); ++y) {
+                    if (isPointInsideTriangle(new Point(x, y), projections[0], projections[1], projections[2])) {
+                        Imgproc.circle(image, new Point(x, y),
+                                1, poly.getColor(),-1);
+                    }
+                }
             }
 
             /*MatOfPoint3f allPointsToProject = poly.getInternalPoints();
@@ -103,7 +112,21 @@ public class Renderer {
                             1, poly.getColor(),-1);
                 }
             }*/
+
+            break;
         }
+    }
+
+    private double triangleArea(Point p0, Point p1, Point p2) {
+        return Math.abs((p0.x * (p1.y - p2.y) + p1.x * (p2.y - p0.y) + p2.x * (p0.y - p1.y)) / 2.0);
+    }
+
+    private boolean isPointInsideTriangle(Point p, Point p0, Point p1, Point p2) {
+        double pp0p1 = triangleArea(p, p0, p1);
+        double pp0p2 = triangleArea(p, p0, p2);
+        double pp1p2 = triangleArea(p, p1, p2);
+        double p0p1p2 = triangleArea(p0, p1, p2);
+        return Double.compare(pp0p1 + pp1p2 + pp0p2, p0p1p2) == 0;
     }
 
     private void projectPointAndGetCameraCoordinates(Mat rtMat, Mat camMatrix, Point3 pointGlobal, double[] camCoords, int[] projCoords) {
@@ -118,24 +141,6 @@ public class Renderer {
 
         projCoords[0] = xPx;
         projCoords[1] = yPx;
-    }
-
-    private double lineSign(int[] point0, int[] point1, int[] point2) {
-        return  (((double)point0[0]) - ((double) point2[0])) *
-                (((double)point1[1]) - ((double)point2[1])) *
-                (((double)point1[0]) - ((double)point2[0])) *
-                (((double)point0[1]) - ((double)point2[1]));
-    }
-
-    private boolean isPointInTriangle(int[] point0, int[] point1, int[] point2, int[] point) {
-        double d1 = lineSign(point, point0, point1);
-        double d2 = lineSign(point, point1, point2);
-        double d3 = lineSign(point, point2, point0);
-
-        boolean hasNeg = Double.compare(d1, 0) < 0 || Double.compare(d2, 0) < 0 || Double.compare(d3, 0) < 0;
-        boolean hasPos = Double.compare(d1, 0) > 0 || Double.compare(d2, 0) > 0 || Double.compare(d3, 0) > 0;
-
-        return !(hasNeg && hasPos);
     }
 
 
