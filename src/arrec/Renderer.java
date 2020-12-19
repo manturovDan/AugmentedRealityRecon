@@ -67,14 +67,15 @@ public class Renderer {
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f vertices2f = new MatOfPoint2f();
             MatOfPoint3f verticesPointsToProject = poly.getPoints();
-            //Calib3d.projectPoints(verticesPointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), vertices, new Mat());
             Point[] projections = new Point[verticesPointsToProject.rows()];
+            Point3[] camCoordinates = new Point3[verticesPointsToProject.rows()];
             for (int v = 0; v < verticesPointsToProject.rows(); ++v) {
                 Point3 vertice = new Point3(verticesPointsToProject.get(v, 0));
                 double[] vCamCoords = new double[3];
                 int[] vProjCoords = new int[2];
                 projectPointAndGetCameraCoordinates(rtMat, camMatrix, vertice, vCamCoords, vProjCoords);
                 projections[v] = new Point(vProjCoords[0], vProjCoords[1]);
+                camCoordinates[v] = new Point3(vCamCoords[0], vCamCoords[1], vCamCoords[2]);
             }
 
             vertices2f.fromArray(projections);
@@ -87,11 +88,24 @@ public class Renderer {
                         5, new Scalar(0, 0, 255), -1);
             }
 
+
+            System.out.println("plane vertices: " + Arrays.toString(camCoordinates));
+            Mathematical.getPlaneCoefficients(camCoordinates[0].x, camCoordinates[0].y, camCoordinates[0].z,
+                                        camCoordinates[1].x, camCoordinates[1].y, camCoordinates[1].z,
+                                        camCoordinates[2].x, camCoordinates[2].y, camCoordinates[2].z);
+
+            Mathematical.getPlaneCoefficients(1, 2, 1,
+                    0, -3, 2,
+                    1, 1, -4);
+
             for (int x = 0; x < image.cols(); ++x) {
                 for (int y = 0; y < image.rows(); ++y) {
-                    if (isPointInsideTriangle(new Point(x, y), projections[0], projections[1], projections[2])) {
+                    if (isPointInsideTriangle(new Point(x, y), projections[0], projections[1], projections[2]) ||
+                            isPointInsideTriangle(new Point(x, y), projections[0], projections[3], projections[2])) {
+
                         Imgproc.circle(image, new Point(x, y),
                                 1, poly.getColor(),-1);
+
                     }
                 }
             }
