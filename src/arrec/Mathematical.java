@@ -29,53 +29,7 @@ public class Mathematical {
         return rtMat;
     }
 
-    public static void getNormalPlaneByPoints(Mat p1, Mat p2, Mat p3, ArrayList<Double> planeCoefs) {
-        System.out.println(p1.dump());
-        System.out.println(p2.dump());
-        System.out.println(p3.dump());
-
-        double a1 = p2.get(0,0)[0] - p1.get(0,0)[0]; //x2 - x1
-        double b1 = p2.get(1,0)[0] - p1.get(1,0)[0]; //y2 - y1
-        double c1 = p2.get(2,0)[0] - p1.get(2,0)[0]; //z2 - z1
-        double a2 = p3.get(0,0)[0] - p1.get(0,0)[0]; //x3 - x1
-        double b2 = p3.get(1,0)[0] - p1.get(1,0)[0]; //y3 - y1
-        double c2 = p3.get(2,0)[0] - p1.get(2,0)[0]; //z3 - z1
-
-        double a = b1 * c2 - b2 * c1;
-        double b = a2 * c1 - a1 * c2;
-        double c = a1 * b2 - b1 * a2;
-        double d = (- a * p1.get(0,0)[0] - b * p1.get( 1,0)[0] - c * p1.get(2,0)[0]); //(- a * x1 - b * y1 - c * z1)
-
-        planeCoefs.add(0, -a / d);
-        planeCoefs.add(1, -b / d);
-        planeCoefs.add(2, -c / d);
-    }
-
-    static void equation_plane(double x1, double y1, double z1,
-                               double x2, double y2, double z2,
-                               double x3, double y3, double z3)
-    {
-
-        System.out.println(x1 + " " + y1 + " " + z1);
-        System.out.println(x2 + " " + y2 + " " + z2);
-        System.out.println(x3 + " " + y3 + " " + z3);
-
-        double a1 = x2 - x1;
-        double b1 = y2 - y1;
-        double c1 = z2 - z1;
-        double a2 = x3 - x1;
-        double b2 = y3 - y1;
-        double c2 = z3 - z1;
-        double a = b1 * c2 - b2 * c1;
-        double b = a2 * c1 - a1 * c2;
-        double c = a1 * b2 - b1 * a2;
-        double d = (- a * x1 - b * y1 - c * z1);
-        System.out.println("equation of plane is " + a +
-                " x + " + b + " y + " + c +
-                " z + " + d + " = 0.");
-    }
-
-    public static void getPlaneCoefficients(double x1, double y1, double z1,
+    public static Mat getPlaneCoefficients(double x1, double y1, double z1,
                                      double x2, double y2, double z2,
                                      double x3, double y3, double z3) {
         Mat planeMat = new Mat(3, 3, CvType.CV_64FC1);
@@ -87,15 +41,28 @@ public class Mathematical {
         for (int i = 0; i < 3; ++i)
             d.put(i, 0, 1.);
 
-        System.out.println(planeMat.dump());
-        System.out.println(d.dump());
+        //System.out.println(planeMat.dump());
+        //System.out.println(d.dump());
 
         Mat gemmMat = new Mat();
         Core.gemm(planeMat.inv(), d, 1, new Mat(), 0, gemmMat);
-        System.out.println("Result: " + gemmMat.dump());
+        //System.out.println("Result: " + gemmMat.dump());
+
+        return gemmMat;
     }
 
-    public static void getNormalPlaneByPoints(ArrayList<Mat> pointsList, ArrayList<Double> planeCoefs) {
-        getNormalPlaneByPoints(pointsList.get(0), pointsList.get(1), pointsList.get(2), planeCoefs);
+    public static double getZ(double A, double B, double C, double xs, double ys, Mat camMatrix) {
+        double fx = camMatrix.get(0, 0)[0];
+        double fy = camMatrix.get(1, 1)[0];
+
+        double cx = camMatrix.get(0, 2)[0];
+        double cy = camMatrix.get(1, 2)[0];
+
+        double x = (xs - cx) / fx;
+        double y = (ys - cy) / fy;
+
+        double zCam = 1. / (A * x + B * y + C);
+        return zCam;
     }
+
 }

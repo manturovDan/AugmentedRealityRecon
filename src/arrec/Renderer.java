@@ -90,13 +90,15 @@ public class Renderer {
 
 
             System.out.println("plane vertices: " + Arrays.toString(camCoordinates));
-            Mathematical.getPlaneCoefficients(camCoordinates[0].x, camCoordinates[0].y, camCoordinates[0].z,
+            Mat plane = Mathematical.getPlaneCoefficients(camCoordinates[0].x, camCoordinates[0].y, camCoordinates[0].z,
                                         camCoordinates[1].x, camCoordinates[1].y, camCoordinates[1].z,
-                                        camCoordinates[2].x, camCoordinates[2].y, camCoordinates[2].z);
+                                        camCoordinates[2].x, camCoordinates[2].y, camCoordinates[2].z); //Ax+By+Cz=1
 
-            Mathematical.getPlaneCoefficients(1, 2, 1,
-                    0, -3, 2,
-                    1, 1, -4);
+            double A = plane.get(0, 0)[0];
+            double B = plane.get(1, 0)[0];
+            double C = plane.get(2, 0)[0];
+
+
 
             for (int x = 0; x < image.cols(); ++x) {
                 for (int y = 0; y < image.rows(); ++y) {
