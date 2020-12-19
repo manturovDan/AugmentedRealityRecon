@@ -12,10 +12,12 @@ public class MainController {
 
     private final File calibrationFile;
     private int camIdx;
+    private boolean raster;
 
-    public MainController(int camId, File camCalibration) {
+    public MainController(int camId, File camCalibration, boolean rasterization) {
         calibrationFile = camCalibration;
         camIdx = camId;
+        raster = rasterization;
     }
 
     public void run() throws Exception {
@@ -37,9 +39,14 @@ public class MainController {
 
         Renderer renderer = new Renderer();
 
-        Model3DImporter mImporter = new Model3DImporter("resources/grogu_v.json");
-        Model3D showingModel = mImporter.build();
+        Model3DImporter mImporter;
 
+        if(raster)
+            mImporter = new Model3DImporter("resources/grogu_v.json");
+        else
+            mImporter = new Model3DImporter("resources/grogu_v_prev.json");
+
+        Model3D showingModel = mImporter.build();
 
         VisionResult snapshot;
         while (!UserInterface.getClosed()) {
@@ -51,7 +58,10 @@ public class MainController {
 
             if (snapshot.getRvecs() != null && snapshot.getTvecs() != null) {
                 //renderer.drawAxis(snapshot.getImage(), vision.getCamMatrix(), vision.getDstMatrix(), snapshot.getRvecs().row(0), snapshot.getTvecs().row(0));
-                renderer.rasterization(showingModel, snapshot.getImage(), vision.getCamMatrix(), vision.getDstMatrix(), snapshot.getRvecs().row(0), snapshot.getTvecs().row(0));
+                if (raster)
+                    renderer.rasterization(showingModel, snapshot.getImage(), vision.getCamMatrix(), vision.getDstMatrix(), snapshot.getRvecs().row(0), snapshot.getTvecs().row(0));
+                else
+                    renderer.drawModel(showingModel, snapshot.getImage(), vision.getCamMatrix(), vision.getDstMatrix(), snapshot.getRvecs().row(0), snapshot.getTvecs().row(0));
             }
 
             gui.updateSnap(renderer.MatToImg(snapshot.getImage()));

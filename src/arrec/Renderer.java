@@ -139,78 +139,21 @@ public class Renderer {
         model3d = model;
         ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue = new ArrayList<>();
 
-        Mat rtMat = Mathematical.getRTMat(tvec, rvec);
-
-        //System.out.println(rtMat.dump());
-
-        ArrayList<Mat> planePoints = new ArrayList<>();
-        DecimalFormat df = new DecimalFormat("####0.0000000");
-
         for (Polygon poly : model.getPolygons()) {
             MatOfPoint2f points2f = new MatOfPoint2f();
             MatOfPoint3f pointsToProject = poly.getPoints();
-            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), points2f, new Mat());
+
+            Calib3d.projectPoints(pointsToProject, rvec, tvec, camMatrix, new MatOfDouble(dstMatrix), points2f, new Mat());
 
             if (!isVisible(points2f))
                 continue;
 
-            Mat coordsMat = new Mat(4, 1, CvType.CV_64FC1);
-            coordsMat.put(3, 0, 1);
-
-            double[][] points = new double[3][3];
-            for (int i = 0; i < 3; ++i) {
-                Mat gemmMat = new Mat();
-                coordsMat.put(0, 0, pointsToProject.get(i, 0));
-                Core.gemm(rtMat, coordsMat, 1, new Mat(), 0, gemmMat);
-                for (int j = 0; j < 3; ++j) {
-                    points[i][j] = gemmMat.get(j, 0)[0];
-                }
-
-                Imgproc.circle(image,
-                        new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
-                        5,
-                        new Scalar(255, 0, 0),
-                        -1);
-
-                Imgproc.putText(image,
-                        "----> " + points[i][0] +
-                                " " + points[i][1] +
-                                " " + points[i][2],
-                        new Point(points2f.get(i, 0)[0], points2f.get(i, 0)[1]),
-                        5,
-                        1.,
-                        new Scalar(255, 0, 0));
-
-
-            }
-/*
-            System.out.println("#");
-            System.out.println(new Point(points[0].get(0,0)[0] / points[0].get(2,0)[0] ,
-                    points[0].get(1,0)[0] / points[0].get(2,0)[0]));
-            System.out.println(new Point(points[1].get(0,0)[0] / points[1].get(2,0)[0] ,
-                    points[1].get(1,0)[0] / points[1].get(2,0)[0]));
-
-            Imgproc.line(image, new Point(points[0].get(0,0)[0] / points[0].get(2,0)[0] ,
-                            points[0].get(1,0)[0] / points[0].get(2,0)[0]),        //p1
-
-                    new Point(points[1].get(0,0)[0] / points[1].get(2,0)[0] ,
-                            points[1].get(1,0)[0] / points[1].get(2,0)[0]),       //p2
-                    new Scalar(0, 0, 255),     //Scalar object for color
-                    5 );
-*/
-            ArrayList<Double> planeCoefs = new ArrayList<>();
-            //Mathematical.getNormalPlaneByPoints(planePoints, planeCoefs);
-
-            System.out.println("Plane coefs:");
-            System.out.println(planeCoefs);
-
             renderQueue.add(new Pair<>(poly, points2f));
-            break;
         }
 
-        //renderQueue = correctRenderOrder(renderQueue);
+        renderQueue = correctRenderOrder(renderQueue);
 
-        //drawQueue(image, renderQueue);
+        drawQueue(image, renderQueue);
     }
 
     private void drawQueue(Mat image, ArrayList<Pair<Polygon, MatOfPoint2f>> renderQueue) {
