@@ -63,32 +63,61 @@ public class Renderer {
         model3d = model;
         Mat rtMat = Mathematical.getRTMat(tvec, rvec);
         double[][] depth = initDepth(image);
-        Mat mask = new Mat(image.rows(), image.cols(), CvType.CV_64FC1);
 
         for (Polygon poly : model.getPolygons()) {
-            MatOfPoint2f vertices = new MatOfPoint2f();
+            MatOfPoint2f vertices2f = new MatOfPoint2f();
             MatOfPoint3f verticesPointsToProject = poly.getPoints();
-            Calib3d.projectPoints(verticesPointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), vertices, new Mat());
-            if (!isVisible(vertices))
+            //Calib3d.projectPoints(verticesPointsToProject, rvec, tvec, camMatrix, new MatOfDouble(0, 0, 0, 0, 0), vertices, new Mat());
+            Point[] projections = new Point[verticesPointsToProject.rows()];
+            for (int v = 0; v < verticesPointsToProject.rows(); ++v) {
+                Point3 vertice = new Point3(verticesPointsToProject.get(v, 0));
+                double[] vCamCoords = new double[3];
+                int[] vProjCoords = new int[2];
+                projectPointAndGetCameraCoordinates(rtMat, camMatrix, vertice, vCamCoords, vProjCoords);
+                projections[v] = new Point(vProjCoords[0], vProjCoords[1]);
+            }
+
+            vertices2f.fromArray(projections);
+
+            if (!isVisible(vertices2f))
                 continue;
 
-            MatOfPoint3f allPointsToProject = poly.getInternalPoints();
-            for (Point3 point : allPointsToProject.toArray()) {
-                double[] camCoords = getCamCoords(rtMat, new double[] {point.x, point.y, point.z});
-                int xPx = (int) (camCoords[0] * camMatrix.get(0, 0)[0] / camCoords[2] + camMatrix.get(0, 2)[0]);
-                int yPx = (int) (camCoords[1] * camMatrix.get(1, 1)[0] / camCoords[2] + camMatrix.get(1, 2)[0]);
+            for (int v = 0; v < verticesPointsToProject.rows(); ++v) {
+                Imgproc.circle(image, new Point(projections[v].x, projections[v].y),
+                        1, poly.getColor(), -1);
+            }
 
-                if(xPx >= image.cols() || yPx >= image.rows() || xPx < 0 || yPx < 0)
+            /*MatOfPoint3f allPointsToProject = poly.getInternalPoints();
+            for (Point3 point : allPointsToProject.toArray()) {
+                double[] camCoords = new double[3];
+                int[] projCoords = new int[2];
+                projectPointAndGetCameraCoordinates(rtMat, camMatrix, point, camCoords, projCoords);
+
+                if(projCoords[0] >= image.cols() || projCoords[1] >= image.rows() || projCoords[0] < 0 || projCoords[1] < 0)
                     continue;
 
-                if (depth[yPx][xPx] >= camCoords[2]) {
-                    depth[yPx][xPx] = camCoords[2];
+                if (depth[projCoords[1]][projCoords[0]] >= camCoords[2]) {
+                    depth[projCoords[1]][projCoords[0]] = camCoords[2];
 
-                    Imgproc.circle(image, new Point(xPx, yPx),
+                    Imgproc.circle(image, new Point(projCoords[0], projCoords[1]),
                             1, poly.getColor(),-1);
                 }
-            }
+            }*/
         }
+    }
+
+    private void projectPointAndGetCameraCoordinates(Mat rtMat, Mat camMatrix, Point3 pointGlobal, double[] camCoords, int[] projCoords) {
+        double[] getCamCoords = getCamCoords(rtMat, new double[] {pointGlobal.x, pointGlobal.y, pointGlobal.z});
+        camCoords[0] = getCamCoords[0];
+        camCoords[1] = getCamCoords[1];
+        camCoords[2] = getCamCoords[2];
+
+
+        int xPx = (int) (camCoords[0] * camMatrix.get(0, 0)[0] / camCoords[2] + camMatrix.get(0, 2)[0]);
+        int yPx = (int) (camCoords[1] * camMatrix.get(1, 1)[0] / camCoords[2] + camMatrix.get(1, 2)[0]);
+
+        projCoords[0] = xPx;
+        projCoords[1] = yPx;
     }
 
     private double lineSign(int[] point0, int[] point1, int[] point2) {
